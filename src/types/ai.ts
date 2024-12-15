@@ -11,6 +11,6 @@ export interface ResearchEntry {
   timestamp: string;
   metadata: {
     tokens: number;
-    complexity: string; // Changed from number to string to match the actual usage
+    complexity: number; // Changed from string to number to match actual usage
   };
 }

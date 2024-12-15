@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
+import { toast } from "@/components/ui/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -12,8 +13,19 @@ const Login = () => {
     // Check if user is already logged in
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (session) {
+        if (event === 'SIGNED_IN') {
+          toast({
+            title: "Welcome back!",
+            description: "You have successfully signed in.",
+          });
           navigate("/");
+        } else if (event === 'SIGNED_OUT') {
+          toast({
+            title: "Signed out",
+            description: "You have been signed out successfully.",
+          });
+        } else if (event === 'USER_UPDATED') {
+          console.log('User updated:', session);
         }
       }
     );
@@ -39,9 +51,42 @@ const Login = () => {
                   brandAccent: '#2563EB',
                 }
               }
+            },
+            style: {
+              button: {
+                borderRadius: '0.375rem',
+                height: '2.5rem',
+              },
+              input: {
+                borderRadius: '0.375rem',
+              },
+              message: {
+                borderRadius: '0.375rem',
+                padding: '0.75rem',
+              }
             }
           }}
           providers={[]}
+          localization={{
+            variables: {
+              sign_in: {
+                email_label: 'Email address',
+                password_label: 'Password',
+                button_label: 'Sign in',
+                loading_button_label: 'Signing in...',
+                social_provider_text: 'Sign in with {{provider}}',
+                link_text: "Don't have an account? Sign up"
+              },
+              sign_up: {
+                email_label: 'Email address',
+                password_label: 'Create a password',
+                button_label: 'Sign up',
+                loading_button_label: 'Signing up...',
+                social_provider_text: 'Sign up with {{provider}}',
+                link_text: "Already have an account? Sign in"
+              }
+            }
+          }}
         />
       </Card>
     </div>
