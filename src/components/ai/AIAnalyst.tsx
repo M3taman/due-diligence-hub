@@ -79,7 +79,7 @@ export const AIAnalyst = () => {
 
       setMessages(prev => [...prev, aiResponse]);
       
-      const researchEntry = {
+      const researchEntry: ResearchEntry = {
         id: uuidv4(),
         query,
         response: analysis,
