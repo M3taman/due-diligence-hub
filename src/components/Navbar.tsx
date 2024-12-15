@@ -1,6 +1,8 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Database, BarChart2, FileText, Settings } from "lucide-react";
+import { Database, BarChart2, FileText, Settings, LogOut } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/use-toast";
 
 const navItems = [
   { label: "Dashboard", path: "/", icon: BarChart2 },
@@ -10,6 +12,24 @@ const navItems = [
 
 export function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate("/login");
+      toast({
+        title: "Logged out successfully",
+        description: "You have been logged out of your account",
+      });
+    } catch (error) {
+      toast({
+        title: "Error logging out",
+        description: "There was a problem logging out of your account",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -19,7 +39,7 @@ export function Navbar() {
           <span className="text-xl font-bold">DueDiligence OS</span>
         </div>
         
-        <div className="flex gap-1">
+        <div className="flex gap-1 flex-1">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -36,6 +56,11 @@ export function Navbar() {
             );
           })}
         </div>
+
+        <Button variant="ghost" onClick={handleLogout} className="flex items-center gap-2">
+          <LogOut className="h-4 w-4" />
+          Logout
+        </Button>
       </div>
     </nav>
   );
