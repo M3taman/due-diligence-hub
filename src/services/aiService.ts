@@ -66,8 +66,34 @@ PRESENTATION GUIDELINES:
 - Balance technical depth with readability
 - Highlight key findings with emphasis`;
 
+const mockAIResponse = (query: string) => {
+  return `## Analysis for: ${query}
+
+### Key Findings
+- Analyzed data from multiple sources
+- Cross-referenced information for accuracy
+- Generated insights based on available data
+
+### Recommendations
+1. Further research recommended
+2. Consider additional data sources
+3. Monitor for updates
+
+*This is a development mock response. Connect to an AI service for production use.*`;
+};
+
 export const generateAIResponse = async (messages: any[]) => {
   try {
+    // For development, return a mock response
+    const lastMessage = messages[messages.length - 1];
+    return {
+      role: "assistant",
+      content: mockAIResponse(lastMessage.content),
+      timestamp: Date.now()
+    };
+
+    // Production code (commented out for now)
+    /*
     const response = await fetch("/api/ai", {
       method: "POST",
       headers: {
@@ -87,6 +113,7 @@ export const generateAIResponse = async (messages: any[]) => {
 
     const data = await response.json();
     return data;
+    */
   } catch (error) {
     console.error("AI Service Error:", error);
     throw error;
