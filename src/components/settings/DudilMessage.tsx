@@ -1,3 +1,4 @@
+import React from 'react';
 import { Message } from "@/types/ai";
 import { renderMarkdown } from "@/utils/aiUtils";
 
