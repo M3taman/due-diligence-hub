@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { Mail } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface NewsletterModalProps {
   open: boolean;
@@ -19,13 +20,20 @@ export function NewsletterModal({ open, onOpenChange }: NewsletterModalProps) {
     setLoading(true);
 
     try {
-      // TODO: Implement newsletter subscription logic
+      const { error } = await supabase.functions.invoke('subscribe-newsletter', {
+        body: { email }
+      });
+
+      if (error) throw error;
+
       toast({
         title: "Success!",
         description: "You've been subscribed to our newsletter.",
       });
       onOpenChange(false);
+      setEmail("");
     } catch (error) {
+      console.error('Newsletter subscription error:', error);
       toast({
         variant: "destructive",
         title: "Error",

@@ -1,12 +1,10 @@
 import { useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Database, FileText, RefreshCw, Upload, Download } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { Message, ResearchEntry } from "@/types/ai";
-import { AIMessage } from "./AIMessage";
+import { AIHeader } from "./AIHeader";
+import { AIMessageList } from "./AIMessageList";
 import { AIAnalysisInput } from "./AIAnalysisInput";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
 export const AIAnalyst = () => {
@@ -17,69 +15,82 @@ export const AIAnalyst = () => {
 
   const generateAnalysis = async (query: string) => {
     const currentDate = new Date().toLocaleDateString();
-    return `# Investment Analysis Report
-    ## ${query}
+    return `# Investment Analysis Report for ${query}
     Generated on: ${currentDate}
 
 ### Executive Summary
-- Industry Position: Market Leader
-- Financial Health: Strong
-- Risk Assessment: Moderate
-- Growth Potential: High
-- Investment Rating: Buy
+- Industry Position: Comprehensive Analysis
+- Financial Health: Detailed Metrics
+- Risk Assessment: Multi-factor Analysis
+- Growth Potential: Market-based Evaluation
+- Investment Rating: Data-driven Recommendation
 
-### 1. Financial Metrics
-| Metric | Value | Industry Avg |
-|--------|--------|--------------|
-| P/E Ratio | 22.5x | 18.2x |
-| EBITDA Margin | 28% | 22% |
-| Revenue Growth (YoY) | +25% | +15% |
-| ROE | 18.5% | 12.3% |
-| Debt/Equity | 0.45 | 0.62 |
+### 1. Financial Performance
+| Metric | Current | YoY Change | Industry Avg |
+|--------|----------|------------|--------------|
+| Revenue | $XXB | +XX% | $XXB |
+| EBITDA Margin | XX% | +XX bps | XX% |
+| FCF Yield | XX% | +XX bps | XX% |
+| ROIC | XX% | +XX bps | XX% |
+| Net Debt/EBITDA | X.Xx | -X.Xx | X.Xx |
 
-### 2. Market Analysis
-- Total Addressable Market: $50B
-- Market Share: 12%
-- YoY Growth Rate: 15%
-- Competitive Position: Top 3
+### 2. Market Position Analysis
+- Market Share: XX% (Trend: ↑)
+- Competitive Position: Leader in XX segments
+- Brand Value: $XXB (YoY: +XX%)
+- Geographic Presence: XX countries
 
-### 3. Risk Assessment
+### 3. Growth Drivers
+1. Organic Growth
+   - Core Market Expansion: XX% CAGR
+   - Product Innovation: XX new launches
+   - Market Penetration: XX% increase
+2. Inorganic Growth
+   - M&A Pipeline: XX potential targets
+   - Strategic Partnerships: XX new alliances
+
+### 4. Risk Assessment
+#### Strategic Risks
+- Market Disruption: LOW
+- Competitive Pressure: MODERATE
+- Technology Obsolescence: LOW
+
 #### Operational Risks
-- Supply Chain Exposure: Low
-- Regulatory Compliance: High
-- Cybersecurity Preparedness: Strong
+- Supply Chain: MODERATE
+- Regulatory: LOW
+- Cybersecurity: MANAGED
 
-#### Financial Risks
-- Liquidity Risk: Low
-- Currency Risk: Moderate
-- Credit Risk: Low
+### 5. Valuation Metrics
+| Multiple | Current | Forward | Sector Avg |
+|----------|----------|----------|------------|
+| P/E | XX.Xx | XX.Xx | XX.Xx |
+| EV/EBITDA | XX.Xx | XX.Xx | XX.Xx |
+| P/B | X.Xx | X.Xx | X.Xx |
+| FCF Yield | XX% | XX% | XX% |
 
-### 4. Growth Catalysts
-1. Geographic Expansion
-   - APAC Market Entry
-   - European Market Consolidation
-2. Product Innovation
-   - R&D Pipeline: Strong
-   - Patent Portfolio: Growing
+### 6. ESG Analysis
+- Environmental Score: XX/100
+- Social Score: XX/100
+- Governance Score: XX/100
+- ESG Ranking: Top XX% in sector
 
-### 5. Valuation Analysis
-- Current Market Cap: $XXB
-- Enterprise Value: $XXB
-- Forward P/E: 20.5x
-- EV/EBITDA: 15.2x
-
-### 6. ESG Considerations
-- Environmental Score: 85/100
-- Social Score: 78/100
-- Governance Score: 92/100
-
-### 7. Investment Recommendation
-**STRONG BUY**
+### 7. Investment Thesis
+**Recommendation: [BUY/HOLD/SELL]**
 - Target Price: $XXX
-- Upside Potential: 25%
-- Investment Horizon: 12-18 months
+- Upside Potential: XX%
+- Investment Horizon: XX months
 
-*Analysis based on market data as of ${currentDate}*`;
+### 8. Key Catalysts
+1. Short-term (0-6 months):
+   - Quarterly earnings
+   - Product launches
+   - Market expansion
+2. Medium-term (6-18 months):
+   - Strategic initiatives
+   - Operational efficiency
+   - Market share gains
+
+*Analysis based on data as of ${currentDate}*`;
   };
 
   const handleSendMessage = async (query: string) => {
@@ -144,7 +155,6 @@ export const AIAnalyst = () => {
   };
 
   const handleUpload = () => {
-    // TODO: Implement file upload functionality
     toast({
       title: "Coming Soon",
       description: "File upload functionality will be available soon.",
@@ -179,48 +189,8 @@ export const AIAnalyst = () => {
 
   return (
     <Card className="p-6 bg-white shadow-lg rounded-xl">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <Database className="h-6 w-6 text-primary" />
-          <h2 className="text-2xl font-semibold">dudil Investment Analyst</h2>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleUpload}>
-            <Upload className="h-4 w-4 mr-2" />
-            Upload Data
-          </Button>
-          <Button variant="outline" onClick={handleDownload}>
-            <Download className="h-4 w-4 mr-2" />
-            Download Report
-          </Button>
-        </div>
-      </div>
-
-      <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground mb-6">
-        <div className="flex items-center gap-1">
-          <FileText className="h-4 w-4" />
-          <span>Real-time Analysis</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <RefreshCw className="h-4 w-4" />
-          <span>Multi-source Data</span>
-        </div>
-      </div>
-
-      <ScrollArea className="h-[600px] pr-4 mb-4">
-        <div className="space-y-6">
-          {messages.map((msg, idx) => (
-            <AIMessage key={idx} message={msg} />
-          ))}
-          {isLoading && (
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <RefreshCw className="h-4 w-4 animate-spin" />
-              <span>Processing analysis...</span>
-            </div>
-          )}
-        </div>
-      </ScrollArea>
-
+      <AIHeader onUpload={handleUpload} onDownload={handleDownload} />
+      <AIMessageList messages={messages} isLoading={isLoading} />
       <AIAnalysisInput onSubmit={handleSendMessage} isLoading={isLoading} />
     </Card>
   );
