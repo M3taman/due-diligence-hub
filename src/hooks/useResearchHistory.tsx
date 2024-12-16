@@ -21,7 +21,7 @@ export const useResearchHistory = () => {
   });
 
   const addResearchEntry = useMutation({
-    mutationFn: async (entry: Omit<ResearchEntry, 'id' | 'timestamp'>) => {
+    mutationFn: async (entry: Omit<ResearchEntry, 'id' | 'created_at' | 'updated_at'>) => {
       const { data, error } = await supabase
         .from('research_history')
         .insert([entry])
