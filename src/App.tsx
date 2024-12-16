@@ -7,6 +7,7 @@ import { Layout } from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Research from "./pages/Research";
 import Settings from "./pages/Settings";
+import FAQ from "./pages/FAQ";
 import Login from "./pages/Login";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -67,6 +68,16 @@ const App = () => (
               <ProtectedRoute>
                 <Layout>
                   <Research />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/faq"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <FAQ />
                 </Layout>
               </ProtectedRoute>
             }

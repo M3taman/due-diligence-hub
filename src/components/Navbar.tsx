@@ -1,12 +1,13 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Database, BarChart2, FileText, Settings, LogOut } from "lucide-react";
+import { Database, BarChart2, FileText, Settings, LogOut, HelpCircle, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 
 const navItems = [
   { label: "Dashboard", path: "/", icon: BarChart2 },
   { label: "Research", path: "/research", icon: FileText },
+  { label: "FAQ", path: "/faq", icon: HelpCircle },
   { label: "Settings", path: "/settings", icon: Settings },
 ];
 
@@ -36,7 +37,7 @@ export function Navbar() {
       <div className="container flex h-16 items-center px-4">
         <div className="flex items-center gap-2 mr-8">
           <Database className="h-6 w-6" />
-          <span className="text-xl font-bold">DueDiligence OS</span>
+          <span className="text-xl font-bold">dudil</span>
         </div>
         
         <div className="flex gap-1 flex-1">
@@ -57,10 +58,16 @@ export function Navbar() {
           })}
         </div>
 
-        <Button variant="ghost" onClick={handleLogout} className="flex items-center gap-2">
-          <LogOut className="h-4 w-4" />
-          Logout
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" className="flex items-center gap-2">
+            <Mail className="h-4 w-4" />
+            Newsletter
+          </Button>
+          <Button variant="ghost" onClick={handleLogout} className="flex items-center gap-2">
+            <LogOut className="h-4 w-4" />
+            Logout
+          </Button>
+        </div>
       </div>
     </nav>
   );

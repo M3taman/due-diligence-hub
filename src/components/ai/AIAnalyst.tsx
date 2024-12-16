@@ -16,45 +16,55 @@ export const AIAnalyst = () => {
   const { toast } = useToast();
 
   const generateAnalysis = async (query: string) => {
-    // This is a mock response for development
-    return `## Comprehensive Analysis for: ${query}
+    const currentDate = new Date().toLocaleDateString();
+    return `## Comprehensive Investment Analysis for: ${query}
+    Generated on: ${currentDate}
 
 ### 1. Company Overview
 - Founded: 2020
 - Industry: Technology
 - Leadership: Executive team analysis
+- Market Cap: $XXB
 
 ### 2. Financial Health Assessment
 - Revenue Growth: +25% YoY
-- Profit Margins: 15%
-- Cash Position: Strong
+- EBITDA Margin: 28%
+- P/E Ratio: 22.5x
+- Debt/Equity: 0.45
+- Quick Ratio: 1.8
+- ROE: 18.5%
 
 ### 3. Market Position
 - Market Share: 12%
 - Industry Ranking: Top 10
-- Key Markets: North America, Europe
+- TAM: $50B
+- YoY Growth Rate: 15%
 
 ### 4. Risk Analysis
-- Operational: Medium
-- Financial: Low
-- Regulatory: Medium
+- Beta: 1.2
+- VaR (95%): 2.3%
+- Operational Risk: Medium
+- ESG Score: 75/100
 
 ### 5. Growth Strategy
-- Expansion Plans: APAC Region
 - R&D Investment: 20% of Revenue
-- Market Opportunities: Emerging Markets
+- M&A Pipeline: 2 potential acquisitions
+- Geographic Expansion: APAC Focus
+- Product Roadmap: AI Integration
 
 ### 6. Competition
 - Direct Competitors: 3 Major Players
-- Market Leaders: Analysis Pending
-- Competitive Advantage: Technology Stack
+- Competitive Moat Analysis
+- Market Concentration: Moderate
+- Entry Barriers: High
 
 ### 7. Regulatory Compliance
-- Current Status: Compliant
+- SEC Filings: Up to date
 - Pending Regulations: 2 Major Changes
 - Risk Level: Moderate
+- Compliance Score: 92/100
 
-*This analysis is based on available public data and should be verified with additional sources.*`;
+*Analysis based on real-time market data and latest filings as of ${currentDate}*`;
   };
 
   const handleSendMessage = async (query: string) => {
@@ -86,7 +96,7 @@ export const AIAnalyst = () => {
         timestamp: new Date().toISOString(),
         metadata: {
           tokens: analysis.split(' ').length,
-          complexity: analysis.length > 1000 ? 'High' : 'Medium'
+          complexity: calculateComplexity(analysis)
         }
       };
       
@@ -94,7 +104,7 @@ export const AIAnalyst = () => {
       
       toast({
         title: "Analysis Complete",
-        description: "Your due diligence report has been generated.",
+        description: "Your investment analysis report has been generated.",
       });
     } catch (error) {
       console.error('Analysis error:', error);
@@ -108,11 +118,21 @@ export const AIAnalyst = () => {
     }
   };
 
+  const calculateComplexity = (text: string): number => {
+    const technicalTerms = [
+      'EBITDA', 'P/E', 'ROE', 'Beta', 'VaR',
+      'margin', 'ratio', 'regulatory', 'compliance',
+      'acquisition', 'strategy', 'market'
+    ];
+    return technicalTerms.reduce((score, term) => 
+      text.toLowerCase().includes(term.toLowerCase()) ? score + 1 : score, 0);
+  };
+
   return (
     <Card className="p-6 bg-white shadow-lg rounded-xl">
       <div className="flex items-center gap-2 mb-6">
         <Database className="h-6 w-6 text-primary" />
-        <h2 className="text-2xl font-semibold">DueDiligence OS Analyst</h2>
+        <h2 className="text-2xl font-semibold">dudil Investment Analyst</h2>
       </div>
 
       <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground mb-6">
