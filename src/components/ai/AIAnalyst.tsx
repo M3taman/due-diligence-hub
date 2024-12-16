@@ -1,12 +1,12 @@
 import { useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Database, FileText, RefreshCw } from "lucide-react";
+import { Database, FileText, RefreshCw, Upload, Download } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { Message, ResearchEntry } from "@/types/ai";
 import { AIMessage } from "./AIMessage";
 import { AIAnalysisInput } from "./AIAnalysisInput";
-import { researchSources } from "@/utils/aiUtils";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
 export const AIAnalyst = () => {
@@ -17,54 +17,69 @@ export const AIAnalyst = () => {
 
   const generateAnalysis = async (query: string) => {
     const currentDate = new Date().toLocaleDateString();
-    return `## Comprehensive Investment Analysis for: ${query}
+    return `# Investment Analysis Report
+    ## ${query}
     Generated on: ${currentDate}
 
-### 1. Company Overview
-- Founded: 2020
-- Industry: Technology
-- Leadership: Executive team analysis
-- Market Cap: $XXB
+### Executive Summary
+- Industry Position: Market Leader
+- Financial Health: Strong
+- Risk Assessment: Moderate
+- Growth Potential: High
+- Investment Rating: Buy
 
-### 2. Financial Health Assessment
-- Revenue Growth: +25% YoY
-- EBITDA Margin: 28%
-- P/E Ratio: 22.5x
-- Debt/Equity: 0.45
-- Quick Ratio: 1.8
-- ROE: 18.5%
+### 1. Financial Metrics
+| Metric | Value | Industry Avg |
+|--------|--------|--------------|
+| P/E Ratio | 22.5x | 18.2x |
+| EBITDA Margin | 28% | 22% |
+| Revenue Growth (YoY) | +25% | +15% |
+| ROE | 18.5% | 12.3% |
+| Debt/Equity | 0.45 | 0.62 |
 
-### 3. Market Position
+### 2. Market Analysis
+- Total Addressable Market: $50B
 - Market Share: 12%
-- Industry Ranking: Top 10
-- TAM: $50B
 - YoY Growth Rate: 15%
+- Competitive Position: Top 3
 
-### 4. Risk Analysis
-- Beta: 1.2
-- VaR (95%): 2.3%
-- Operational Risk: Medium
-- ESG Score: 75/100
+### 3. Risk Assessment
+#### Operational Risks
+- Supply Chain Exposure: Low
+- Regulatory Compliance: High
+- Cybersecurity Preparedness: Strong
 
-### 5. Growth Strategy
-- R&D Investment: 20% of Revenue
-- M&A Pipeline: 2 potential acquisitions
-- Geographic Expansion: APAC Focus
-- Product Roadmap: AI Integration
+#### Financial Risks
+- Liquidity Risk: Low
+- Currency Risk: Moderate
+- Credit Risk: Low
 
-### 6. Competition
-- Direct Competitors: 3 Major Players
-- Competitive Moat Analysis
-- Market Concentration: Moderate
-- Entry Barriers: High
+### 4. Growth Catalysts
+1. Geographic Expansion
+   - APAC Market Entry
+   - European Market Consolidation
+2. Product Innovation
+   - R&D Pipeline: Strong
+   - Patent Portfolio: Growing
 
-### 7. Regulatory Compliance
-- SEC Filings: Up to date
-- Pending Regulations: 2 Major Changes
-- Risk Level: Moderate
-- Compliance Score: 92/100
+### 5. Valuation Analysis
+- Current Market Cap: $XXB
+- Enterprise Value: $XXB
+- Forward P/E: 20.5x
+- EV/EBITDA: 15.2x
 
-*Analysis based on real-time market data and latest filings as of ${currentDate}*`;
+### 6. ESG Considerations
+- Environmental Score: 85/100
+- Social Score: 78/100
+- Governance Score: 92/100
+
+### 7. Investment Recommendation
+**STRONG BUY**
+- Target Price: $XXX
+- Upside Potential: 25%
+- Investment Horizon: 12-18 months
+
+*Analysis based on market data as of ${currentDate}*`;
   };
 
   const handleSendMessage = async (query: string) => {
@@ -128,11 +143,57 @@ export const AIAnalyst = () => {
       text.toLowerCase().includes(term.toLowerCase()) ? score + 1 : score, 0);
   };
 
+  const handleUpload = () => {
+    // TODO: Implement file upload functionality
+    toast({
+      title: "Coming Soon",
+      description: "File upload functionality will be available soon.",
+    });
+  };
+
+  const handleDownload = () => {
+    if (messages.length === 0) {
+      toast({
+        title: "No Analysis",
+        description: "Generate an analysis first before downloading.",
+      });
+      return;
+    }
+
+    const lastAnalysis = messages[messages.length - 1].content;
+    const blob = new Blob([lastAnalysis], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `investment-analysis-${new Date().toISOString()}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Download Started",
+      description: "Your analysis report is being downloaded.",
+    });
+  };
+
   return (
     <Card className="p-6 bg-white shadow-lg rounded-xl">
-      <div className="flex items-center gap-2 mb-6">
-        <Database className="h-6 w-6 text-primary" />
-        <h2 className="text-2xl font-semibold">dudil Investment Analyst</h2>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2">
+          <Database className="h-6 w-6 text-primary" />
+          <h2 className="text-2xl font-semibold">dudil Investment Analyst</h2>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleUpload}>
+            <Upload className="h-4 w-4 mr-2" />
+            Upload Data
+          </Button>
+          <Button variant="outline" onClick={handleDownload}>
+            <Download className="h-4 w-4 mr-2" />
+            Download Report
+          </Button>
+        </div>
       </div>
 
       <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground mb-6">
@@ -147,7 +208,7 @@ export const AIAnalyst = () => {
       </div>
 
       <ScrollArea className="h-[600px] pr-4 mb-4">
-        <div className="space-y-4">
+        <div className="space-y-6">
           {messages.map((msg, idx) => (
             <AIMessage key={idx} message={msg} />
           ))}

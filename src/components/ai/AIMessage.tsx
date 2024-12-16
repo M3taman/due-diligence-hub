@@ -10,19 +10,22 @@ export const AIMessage = ({ message }: AIMessageProps) => {
     <div
       className={`flex ${
         message.role === "user" ? "justify-end" : "justify-start"
-      } mb-4`}
+      } mb-6`}
     >
       <div
-        className={`rounded-lg px-6 py-4 max-w-[85%] ${
+        className={`rounded-lg px-8 py-6 ${
           message.role === "user"
-            ? "bg-primary text-primary-foreground"
-            : "bg-secondary"
+            ? "bg-primary text-primary-foreground max-w-[40%]"
+            : "bg-secondary/50 max-w-[90%] w-full"
         }`}
       >
-        {message.role === "assistant" 
-          ? renderMarkdown(message.content)
-          : message.content
-        }
+        {message.role === "assistant" ? (
+          <div className="prose prose-lg max-w-none dark:prose-invert">
+            {renderMarkdown(message.content)}
+          </div>
+        ) : (
+          <p className="text-lg">{message.content}</p>
+        )}
       </div>
     </div>
   );
