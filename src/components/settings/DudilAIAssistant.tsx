@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Message, ResearchEntry } from "@/types/ai";
 import { DudilMessage } from "./DudilMessage";
 import { researchSources } from "@/utils/aiUtils";
+import { supabase } from "@/integrations/supabase/client";
 
 const systemPrompt = `You are an advanced business intelligence analyst specializing in comprehensive due diligence. 
 Your mission is to provide an extremely detailed, multi-dimensional analysis with rich insights.
@@ -73,18 +74,32 @@ export const DudilAIAssistant = () => {
       text.toLowerCase().includes(term) ? score + 1 : score, 0);
   };
 
-  const addToResearchHistory = useCallback((query: string, response: string) => {
-    const researchEntry = {
-      id: uuidv4(),
+  const addToResearchHistory = useCallback(async (query: string, response: string) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user?.id) return;
+
+    const researchEntry: Omit<ResearchEntry, 'id' | 'created_at' | 'updated_at'> = {
+      user_id: session.user.id,
       query,
       response,
-      timestamp: new Date().toISOString(),
       metadata: {
         tokens: response.split(' ').length,
         complexity: calculateComplexity(response)
       }
     };
-    setResearchHistory(prev => [researchEntry, ...prev]);
+
+    const { data, error } = await supabase
+      .from('research_history')
+      .insert([researchEntry])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving research:', error);
+      return;
+    }
+
+    setResearchHistory(prev => [data as ResearchEntry, ...prev]);
   }, []);
 
   const generateAnalysis = async (query: string) => {
@@ -155,7 +170,7 @@ export const DudilAIAssistant = () => {
       };
 
       setMessages(prev => [...prev, aiResponse]);
-      addToResearchHistory(input, analysis);
+      await addToResearchHistory(input, analysis);
     } catch (error) {
       console.error('Analysis error:', error);
     } finally {

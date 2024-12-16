@@ -29,10 +29,10 @@ export const ResearchHistory = () => {
             <Card key={entry.id} className="p-4">
               <h3 className="font-medium mb-2">{entry.query}</h3>
               <div className="text-sm text-muted-foreground">
-                {new Date(entry.timestamp).toLocaleDateString()}
+                {new Date(entry.created_at).toLocaleDateString()}
               </div>
               <div className="mt-2 text-sm">
-                Complexity Score: {entry.metadata.complexity}
+                Complexity Score: {entry.metadata?.complexity ?? 'N/A'}
               </div>
             </Card>
           ))}

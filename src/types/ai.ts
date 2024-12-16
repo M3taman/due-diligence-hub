@@ -6,13 +6,13 @@ export interface Message {
 
 export interface ResearchEntry {
   id: string;
-  user_id: string;
+  user_id: string | null;
   query: string;
-  response: string | any; // Support both string and JSON
+  response: string | any;
   metadata: {
     tokens: number;
     complexity: number;
-  };
+  } | null;
   created_at: string;
   updated_at: string;
 }
