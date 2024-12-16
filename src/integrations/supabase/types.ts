@@ -104,6 +104,36 @@ export type Database = {
           },
         ]
       }
+      research_history: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json | null
+          query: string
+          response: Json
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          query: string
+          response: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          query?: string
+          response?: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       teams: {
         Row: {
           created_at: string

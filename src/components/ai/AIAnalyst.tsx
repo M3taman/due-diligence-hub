@@ -1,17 +1,18 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { v4 as uuidv4 } from "uuid";
-import { Message, ResearchEntry } from "@/types/ai";
+import { Message } from "@/types/ai";
 import { AIHeader } from "./AIHeader";
 import { AIMessageList } from "./AIMessageList";
 import { AIAnalysisInput } from "./AIAnalysisInput";
 import { useToast } from "@/components/ui/use-toast";
+import { useResearchHistory } from "@/hooks/useResearchHistory";
+import { supabase } from "@/integrations/supabase/client";
 
 export const AIAnalyst = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [researchHistory, setResearchHistory] = useState<ResearchEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { addResearchEntry } = useResearchHistory();
 
   const generateAnalysis = async (query: string) => {
     const currentDate = new Date().toLocaleDateString();
@@ -114,20 +115,22 @@ export const AIAnalyst = () => {
       };
 
       setMessages(prev => [...prev, aiResponse]);
+
+      // Get current user
+      const { data: { session } } = await supabase.auth.getSession();
       
-      const researchEntry: ResearchEntry = {
-        id: uuidv4(),
-        query,
-        response: analysis,
-        timestamp: new Date().toISOString(),
-        metadata: {
-          tokens: analysis.split(' ').length,
-          complexity: calculateComplexity(analysis)
-        }
-      };
-      
-      setResearchHistory(prev => [researchEntry, ...prev]);
-      
+      if (session?.user) {
+        await addResearchEntry.mutateAsync({
+          query,
+          response: analysis,
+          user_id: session.user.id,
+          metadata: {
+            tokens: analysis.split(' ').length,
+            complexity: calculateComplexity(analysis)
+          }
+        });
+      }
+
       toast({
         title: "Analysis Complete",
         description: "Your investment analysis report has been generated.",
