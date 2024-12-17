@@ -3,6 +3,7 @@ import { Message } from "@/types/ai";
 import { useToast } from "@/components/ui/use-toast";
 import { useResearchHistory } from "@/hooks/useResearchHistory";
 import { supabase } from "@/integrations/supabase/client";
+import { handleError } from "@/utils/errorHandling";
 
 export const useAIAnalysis = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -67,12 +68,7 @@ export const useAIAnalysis = () => {
         description: "Your investment analysis report has been generated.",
       });
     } catch (error) {
-      console.error('Analysis error:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to generate analysis. Please try again.",
-      });
+      handleError(error);
     } finally {
       setIsLoading(false);
     }
