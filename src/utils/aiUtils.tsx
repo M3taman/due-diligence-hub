@@ -19,7 +19,6 @@ export const renderMarkdown = (content: string) => {
     marked.setOptions({
       breaks: true,
       gfm: true,
-      headerIds: true,
       langPrefix: 'language-',
     });
     
