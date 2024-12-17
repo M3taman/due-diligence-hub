@@ -2,6 +2,10 @@ export interface Message {
   role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: number;
+  charts?: {
+    title: string;
+    data: any[];
+  }[];
 }
 
 export interface ResearchEntry {
