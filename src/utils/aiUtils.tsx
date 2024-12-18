@@ -18,8 +18,7 @@ export const renderMarkdown = (content: string) => {
   try {
     marked.setOptions({
       breaks: true,
-      gfm: true,
-      headerPrefix: 'section-'
+      gfm: true
     });
     
     const html = marked.parse(content);

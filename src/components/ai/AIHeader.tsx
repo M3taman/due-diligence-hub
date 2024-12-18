@@ -13,7 +13,7 @@ export const AIHeader = ({ onUpload, onDownload }: AIHeaderProps) => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Database className="h-6 w-6 text-primary" />
-          <h2 className="text-2xl font-semibold">dudil Investment Analyst</h2>
+          <h2 className="text-2xl font-semibold">dudil Due Diligence Analyst</h2>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={onUpload}>
@@ -30,11 +30,11 @@ export const AIHeader = ({ onUpload, onDownload }: AIHeaderProps) => {
       <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground mb-6">
         <div className="flex items-center gap-1">
           <FileText className="h-4 w-4" />
-          <span>Real-time Analysis</span>
+          <span>Comprehensive Analysis</span>
         </div>
         <div className="flex items-center gap-1">
           <RefreshCw className="h-4 w-4" />
-          <span>Multi-source Data</span>
+          <span>Multi-source Intelligence</span>
         </div>
       </div>
     </>
