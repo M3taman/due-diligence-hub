@@ -4,8 +4,17 @@ export interface Message {
   timestamp: number;
   charts?: {
     title: string;
-    data: any[];
+    data: Array<{
+      name: string;
+      value: number;
+      [key: string]: any;
+    }>;
   }[];
+  metadata?: {
+    complexity: number;
+    confidence: number;
+    sources: string[];
+  };
 }
 
 export interface ResearchEntry {
