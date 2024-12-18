@@ -80,9 +80,19 @@ const renderChart = (chart: any) => {
 export const AIMessage = ({ message }: AIMessageProps) => {
   return (
     <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} mb-4`}>
-      <div className={`max-w-[80%] ${message.role === 'user' ? 'order-1' : 'order-2'}`}>
-        <Card className="p-4">
-          <div className="prose prose-sm">
+      <div className={`max-w-[95%] ${message.role === 'user' ? 'order-1' : 'order-2'}`}>
+        <Card className="p-6">
+          <div className="prose prose-sm max-w-none
+            prose-headings:font-semibold 
+            prose-h1:text-2xl prose-h1:mb-4
+            prose-h2:text-xl prose-h2:mb-3
+            prose-h3:text-lg prose-h3:mb-2
+            prose-p:text-base prose-p:mb-4
+            prose-li:text-base
+            prose-strong:text-primary
+            prose-table:text-sm prose-table:w-full
+            prose-td:border prose-td:p-2
+            prose-th:border prose-th:p-2 prose-th:bg-muted">
             {renderMarkdown(message.content)}
             {message.charts && message.charts.map((chart, index) => (
               <div key={index} className="my-4">
