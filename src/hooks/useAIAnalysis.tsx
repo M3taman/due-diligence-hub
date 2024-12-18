@@ -11,7 +11,6 @@ export const useAIAnalysis = () => {
   const { toast } = useToast();
   const { addResearchEntry } = useResearchHistory();
 
-  // Subscribe to real-time updates
   useEffect(() => {
     const channel = supabase
       .channel('research_updates')
@@ -22,13 +21,13 @@ export const useAIAnalysis = () => {
           schema: 'public',
           table: 'research_history'
         },
-        (payload) => {
-          console.log('Real-time update:', payload);
-          // Update messages if needed based on the payload
-          if (payload.new && typeof payload.new.response === 'string') {
+        (payload: any) => {
+          if (payload.new && payload.new.response) {
             const newMessage: Message = {
               role: 'assistant',
-              content: payload.new.response,
+              content: typeof payload.new.response === 'string' 
+                ? payload.new.response 
+                : JSON.stringify(payload.new.response),
               timestamp: new Date(payload.new.created_at).getTime()
             };
             setMessages(prev => [...prev, newMessage]);

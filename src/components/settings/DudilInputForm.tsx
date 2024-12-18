@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { RefreshCw } from "lucide-react";
 
 interface DudilInputFormProps {
   onSubmit: (query: string) => void;

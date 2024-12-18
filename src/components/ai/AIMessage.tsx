@@ -10,31 +10,57 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar
 } from "recharts";
 
 interface AIMessageProps {
   message: Message;
 }
 
-const renderChart = (data: any) => {
-  if (!data || !Array.isArray(data)) return null;
+const renderChart = (chart: any) => {
+  if (!chart || !chart.data || !Array.isArray(chart.data)) return null;
+  
+  const ChartComponent = chart.type === 'area' ? AreaChart : 
+                        chart.type === 'bar' ? BarChart : LineChart;
+  
+  const DataComponent = chart.type === 'area' ? Area :
+                       chart.type === 'bar' ? Bar : Line;
   
   return (
     <div className="h-[300px] w-full my-6">
+      <h4 className="text-lg font-semibold mb-2">{chart.title}</h4>
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data}>
+        <ChartComponent data={chart.data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
           <Tooltip />
           <Legend />
-          <Line
-            type="monotone"
-            dataKey="value"
-            stroke="#3B82F6"
-            strokeWidth={2}
-          />
-        </LineChart>
+          {chart.series ? (
+            chart.series.map((series: any, index: number) => (
+              <DataComponent
+                key={series.name}
+                type="monotone"
+                dataKey={series.dataKey}
+                name={series.name}
+                stroke={series.color || `hsl(${index * 45}, 70%, 50%)`}
+                fill={series.color || `hsl(${index * 45}, 70%, 50%)`}
+                strokeWidth={2}
+              />
+            ))
+          ) : (
+            <DataComponent
+              type="monotone"
+              dataKey="value"
+              stroke="#3B82F6"
+              fill="#3B82F6"
+              strokeWidth={2}
+            />
+          )}
+        </ChartComponent>
       </ResponsiveContainer>
     </div>
   );
@@ -59,8 +85,7 @@ export const AIMessage = ({ message }: AIMessageProps) => {
             {renderMarkdown(message.content)}
             {message.charts && message.charts.map((chart, index) => (
               <div key={index} className="my-4">
-                <h4 className="text-lg font-semibold mb-2">{chart.title}</h4>
-                {renderChart(chart.data)}
+                {renderChart(chart)}
               </div>
             ))}
           </Card>
