@@ -9,35 +9,24 @@ const Index = () => {
   const features = [
     {
       icon: Shield,
-      title: "Comprehensive Due Diligence",
-      description: "AI-powered analysis covering all aspects of business evaluation"
+      title: "Due Diligence Analysis",
+      description: "AI-powered comprehensive business evaluation and risk assessment"
     },
     {
       icon: BarChart2,
-      title: "Real-time Market Intelligence",
-      description: "Live data and insights from multiple authoritative sources"
+      title: "Market Intelligence",
+      description: "Real-time data and insights from authoritative sources"
     },
     {
       icon: FileText,
-      title: "Detailed Reports",
-      description: "Professional-grade documentation and analysis reports"
+      title: "Research Reports",
+      description: "Professional-grade documentation and analysis"
     },
     {
       icon: Zap,
       title: "Instant Analysis",
-      description: "Get insights in seconds, not days or weeks"
+      description: "Get insights in seconds, not days"
     }
-  ];
-
-  const benefits = [
-    "AI-powered analysis engine",
-    "Multi-source data validation",
-    "Real-time market insights",
-    "Comprehensive risk assessment",
-    "Automated report generation",
-    "Expert support team",
-    "Unlimited research queries",
-    "Priority processing"
   ];
 
   const pricingTiers = [
@@ -46,7 +35,7 @@ const Index = () => {
       price: "500",
       period: "month",
       features: [
-        "5 reports per month",
+        "5 due diligence reports/month",
         "Basic market analysis",
         "Standard support",
         "1 team member"
@@ -85,11 +74,11 @@ const Index = () => {
       <section className="bg-gradient-to-b from-primary/5 via-background to-background pt-24 pb-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80 leading-tight">
-              Transform Your Due Diligence Process
+            <h1 className="text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
+              Due Diligence OS
             </h1>
-            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-              Harness the power of AI to make faster, smarter investment decisions with comprehensive analysis and real-time insights
+            <p className="text-xl text-muted-foreground mb-8">
+              AI-powered platform for comprehensive business intelligence and due diligence analysis
             </p>
             <div className="flex gap-4 justify-center">
               <Button size="lg" onClick={() => navigate("/signup")} className="text-lg px-8">
@@ -112,7 +101,7 @@ const Index = () => {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="p-6 hover:shadow-lg transition-shadow duration-200 border-primary/10">
+              <Card key={index} className="p-6 hover:shadow-lg transition-shadow duration-200">
                 <feature.icon className="h-12 w-12 text-primary mb-4" />
                 <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
                 <p className="text-muted-foreground">{feature.description}</p>
@@ -122,28 +111,8 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-24 bg-primary/5">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4">Why Choose Our Platform</h2>
-              <p className="text-xl text-muted-foreground">Industry-leading features that set us apart</p>
-            </div>
-            <div className="grid md:grid-cols-2 gap-6">
-              {benefits.map((benefit, index) => (
-                <div key={index} className="flex items-center gap-3 bg-background p-4 rounded-lg shadow-sm">
-                  <CheckCircle className="text-primary h-5 w-5 flex-shrink-0" />
-                  <span className="text-lg">{benefit}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Pricing Section */}
-      <section className="py-24 bg-background">
+      <section className="py-24 bg-background" id="pricing">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
@@ -151,10 +120,10 @@ const Index = () => {
           </div>
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {pricingTiers.map((tier, index) => (
-              <Card key={index} className={`p-8 ${tier.popular ? 'border-primary shadow-lg' : 'border-primary/10'}`}>
+              <Card key={index} className={`p-8 relative ${tier.popular ? 'border-primary shadow-lg' : ''}`}>
                 {tier.popular && (
                   <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-4 py-1 rounded-bl-lg rounded-tr-lg text-sm font-medium">
-                    Popular
+                    Most Popular
                   </div>
                 )}
                 <h3 className="text-2xl font-bold mb-2">{tier.name}</h3>
