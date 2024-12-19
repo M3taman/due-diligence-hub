@@ -33,6 +33,41 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_events: {
+        Row: {
+          created_at: string
+          event_data: Json
+          event_type: string
+          id: string
+          payment_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_data: Json
+          event_type: string
+          id?: string
+          payment_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_data?: Json
+          event_type?: string
+          id?: string
+          payment_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_events_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -76,6 +111,8 @@ export type Database = {
           full_name: string | null
           id: string
           role: string | null
+          subscription_expires_at: string | null
+          subscription_status: string | null
           team_id: string | null
           updated_at: string
           username: string | null
@@ -86,6 +123,8 @@ export type Database = {
           full_name?: string | null
           id: string
           role?: string | null
+          subscription_expires_at?: string | null
+          subscription_status?: string | null
           team_id?: string | null
           updated_at?: string
           username?: string | null
@@ -96,6 +135,8 @@ export type Database = {
           full_name?: string | null
           id?: string
           role?: string | null
+          subscription_expires_at?: string | null
+          subscription_status?: string | null
           team_id?: string | null
           updated_at?: string
           username?: string | null
