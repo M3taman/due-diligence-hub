@@ -4,7 +4,7 @@ import { FileText, BarChart2, Shield, Users, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 const features = [
   {
@@ -24,13 +24,20 @@ const features = [
   }
 ];
 
+// Note: These price IDs need to be replaced with your actual Stripe price IDs
+const STRIPE_PRICE_IDS = {
+  STARTER: process.env.STRIPE_PRICE_ID_STARTER || 'price_placeholder_starter',
+  PRO: process.env.STRIPE_PRICE_ID_PRO || 'price_placeholder_pro',
+  ENTERPRISE: process.env.STRIPE_PRICE_ID_ENTERPRISE || 'price_placeholder_enterprise'
+};
+
 const pricingPlans = [
   {
     name: "Starter",
     price: 500,
     period: "month",
     features: ["Up to 5 users", "Unlimited analysis", "24/7 support"],
-    stripePriceId: "price_starter",
+    stripePriceId: STRIPE_PRICE_IDS.STARTER,
     paypalPlanId: "P-STARTER",
     color: "blue"
   },
@@ -39,7 +46,7 @@ const pricingPlans = [
     price: 1000,
     period: "month",
     features: ["Up to 10 users", "Priority support", "Advanced analytics"],
-    stripePriceId: "price_pro",
+    stripePriceId: STRIPE_PRICE_IDS.PRO,
     paypalPlanId: "P-PRO",
     color: "indigo"
   },
@@ -48,7 +55,7 @@ const pricingPlans = [
     price: null,
     period: "month",
     features: ["Unlimited users", "Custom integration", "Dedicated support"],
-    stripePriceId: "price_enterprise",
+    stripePriceId: STRIPE_PRICE_IDS.ENTERPRISE,
     paypalPlanId: "P-ENTERPRISE",
     color: "purple"
   }
@@ -62,15 +69,30 @@ const Dashboard = () => {
       setIsLoading(true);
       const user = (await supabase.auth.getUser()).data.user;
       
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to make a purchase.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log('Creating checkout session for price:', priceId);
       const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
-        body: { priceId, userId: user?.id },
+        body: { priceId, userId: user.id },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Checkout error:', error);
+        throw error;
+      }
+      
       if (data?.url) {
         window.location.href = data.url;
       }
     } catch (error) {
+      console.error('Checkout error:', error);
       toast({
         title: "Error",
         description: "Failed to initiate checkout. Please try again.",
@@ -86,8 +108,17 @@ const Dashboard = () => {
       setIsLoading(true);
       const user = (await supabase.auth.getUser()).data.user;
       
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to make a purchase.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke('create-paypal-order', {
-        body: { planId, userId: user?.id },
+        body: { planId, userId: user.id },
       });
 
       if (error) throw error;
@@ -95,6 +126,7 @@ const Dashboard = () => {
         window.location.href = `https://www.paypal.com/checkoutnow?token=${data.id}`;
       }
     } catch (error) {
+      console.error('PayPal checkout error:', error);
       toast({
         title: "Error",
         description: "Failed to initiate PayPal checkout. Please try again.",
