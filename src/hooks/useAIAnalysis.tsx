@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Message } from "@/types/ai";
 import { useToast } from "@/components/ui/use-toast";
 import { useResearchHistory } from "@/hooks/useResearchHistory";
@@ -28,7 +28,8 @@ export const useAIAnalysis = () => {
               content: typeof payload.new.response === 'string' 
                 ? payload.new.response 
                 : JSON.stringify(payload.new.response),
-              timestamp: new Date(payload.new.created_at).getTime()
+              timestamp: new Date().getTime(),
+              status: 'complete'
             };
             setMessages(prev => [...prev, newMessage]);
           }
@@ -41,74 +42,64 @@ export const useAIAnalysis = () => {
     };
   }, []);
 
-  const calculateComplexity = (text: string): number => {
-    const technicalTerms = [
-      'EBITDA', 'P/E', 'ROE', 'Beta', 'VaR', 'DCF',
-      'margin', 'ratio', 'regulatory', 'compliance',
-      'acquisition', 'strategy', 'market', 'portfolio',
-      'diversification', 'liquidity', 'volatility'
-    ];
-    return technicalTerms.reduce((score, term) => 
-      text.toLowerCase().includes(term.toLowerCase()) ? score + 1 : score, 0);
-  };
-
-  const handleSendMessage = async (query: string) => {
+  const handleSendMessage = useCallback(async (content: string) => {
     if (isLoading) return;
 
-    const userMessage = {
-      role: 'user' as const,
-      content: query,
-      timestamp: Date.now()
+    const userMessage: Message = {
+      role: 'user',
+      content,
+      timestamp: new Date().getTime(),
+      status: 'complete'
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setIsLoading(true);
-
     try {
-      const { data, error } = await supabase.functions.invoke('analyze-investment', {
-        body: { query }
+      setIsLoading(true);
+      setMessages(prev => [...prev, userMessage]);
+
+      const { data, error } = await supabase.functions.invoke('analyze-query', {
+        body: { content, messageHistory: messages.slice(-5) }
       });
 
       if (error) throw error;
 
-      const analysis = data.analysis;
-      const aiResponse = {
-        role: 'assistant' as const,
-        content: analysis,
-        timestamp: Date.now(),
-        charts: data.charts
+      const aiResponse: Message = {
+        role: 'assistant',
+        content: data.response,
+        timestamp: new Date().getTime(),
+        status: 'complete'
       };
 
       setMessages(prev => [...prev, aiResponse]);
 
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        await addResearchEntry.mutateAsync({
-          query,
-          response: analysis,
-          user_id: session.user.id,
-          metadata: {
-            tokens: analysis.split(' ').length,
-            complexity: calculateComplexity(analysis)
-          }
-        });
-      }
-
-      toast({
-        title: "Analysis Complete",
-        description: "Your investment analysis report has been generated.",
+      await addResearchEntry({
+        query: content,
+        response: data.response,
+        timestamp: new Date().toISOString(),
+        metadata: data.metadata
       });
+
     } catch (error) {
-      handleError(error);
+      const errorMessage = handleError(error);
+      toast({
+        variant: "destructive",
+        title: "Analysis Error",
+        description: errorMessage
+      });
+
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `Error: ${errorMessage}`,
+        timestamp: new Date().getTime(),
+        status: 'error'
+      }]);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isLoading, messages, toast, addResearchEntry]);
 
   return {
     messages,
     isLoading,
-    handleSendMessage,
+    handleSendMessage
   };
 };

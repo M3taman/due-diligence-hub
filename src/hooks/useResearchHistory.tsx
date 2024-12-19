@@ -32,25 +32,82 @@ export const useResearchHistory = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['researchHistory'] });
+      queryClient.invalidateQueries(['researchHistory']);
       toast({
         title: "Analysis Saved",
-        description: "Your research has been saved to history.",
+        description: "Research entry has been saved successfully"
       });
     },
     onError: (error) => {
-      console.error('Error saving research:', error);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to save research to history.",
+        title: "Save Failed",
+        description: error.message
+      });
+    }
+  });
+
+  const deleteResearchEntry = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('research_history')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['researchHistory']);
+      toast({
+        title: "Entry Deleted",
+        description: "Research entry has been removed"
       });
     },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Delete Failed",
+        description: error.message
+      });
+    }
+  });
+
+  const updateResearchEntry = useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<ResearchEntry> & { id: string }) => {
+      const { data, error } = await supabase
+        .from('research_history')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['researchHistory']);
+      toast({
+        title: "Entry Updated",
+        description: "Research entry has been updated"
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Update Failed",
+        description: error.message
+      });
+    }
   });
 
   return {
     researchHistory,
     isLoading,
-    addResearchEntry,
+    addResearchEntry: addResearchEntry.mutate,
+    deleteResearchEntry: deleteResearchEntry.mutate,
+    updateResearchEntry: updateResearchEntry.mutate,
+    isAddingEntry: addResearchEntry.isLoading,
+    isDeletingEntry: deleteResearchEntry.isLoading,
+    isUpdatingEntry: updateResearchEntry.isLoading
   };
 };

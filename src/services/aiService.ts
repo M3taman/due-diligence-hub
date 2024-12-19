@@ -1,130 +1,107 @@
 import { marked } from "marked";
+import { supabase } from "@/integrations/supabase/client";
+
+interface AnalysisResult {
+  content: string;
+  confidence: number;
+  sources: string[];
+  metadata: {
+    timestamp: string;
+    category: string;
+    complexity: number;
+    lastUpdated: string;
+  };
+}
 
 const researchSources = [
   "SEC EDGAR Filings",
-  "Bloomberg Financial Data",
-  "Crunchbase Company Profiles",
-  "Yahoo Finance",
-  "Google News",
-  "LinkedIn Company Insights",
-  "Glassdoor Company Reviews",
-  "Patent and Trademark Databases"
+  "Bloomberg Terminal Data",
+  "Refinitiv Eikon",
+  "S&P Global Market Intelligence",
+  "Moody's Analytics",
+  "FactSet Research Systems",
+  "Thomson Reuters Datastream",
+  "Capital IQ",
+  "PitchBook Data",
+  "Crunchbase Pro",
+  "LinkedIn Sales Navigator",
+  "D&B Hoovers",
+  "Alpha Vantage API",
+  "Yahoo Finance API",
+  "FRED Economic Data"
 ];
 
-const systemPrompt = `You are Dudil, an advanced business intelligence analyst specializing in comprehensive due diligence. 
-Your mission is to provide an extremely detailed, multi-dimensional analysis with rich insights.
+const systemPrompt = `You are Dudil, an advanced business intelligence analyst specializing in comprehensive due diligence analysis.
 
-RESEARCH METHODOLOGY:
-- Utilize multiple authoritative sources: ${researchSources.join(", ")}
-- Cross-reference and validate information from diverse platforms
-- Provide real-time, up-to-date insights
-- Maintain objectivity and depth in analysis
+Your expertise includes:
+1. Financial Analysis: Evaluate financial statements, ratios, and performance metrics
+2. Market Analysis: Assess market position, competition, and industry trends
+3. Risk Assessment: Identify and analyze operational, financial, and regulatory risks
+4. Compliance Review: Evaluate regulatory compliance and governance practices
+5. Growth Analysis: Assess growth potential and strategic opportunities
 
-CRITICAL ANALYSIS FRAMEWORK:
-1. Comprehensive Company Overview
-   - Detailed corporate history
-   - Organizational structure
-   - Leadership team assessment
+Guidelines:
+- Provide data-driven insights supported by reliable sources
+- Use latest available market data and financial information
+- Consider both quantitative and qualitative factors
+- Maintain objectivity in analysis
+- Highlight key risks and opportunities
+- Structure responses clearly with relevant sections
+- Include specific metrics and benchmarks when applicable
 
-2. Detailed Financial Health Assessment
-   - Revenue trends
-   - Profitability metrics
-   - Balance sheet analysis
-   - Cash flow dynamics
+Format your response in markdown with clear sections and bullet points.`;
 
-3. Precise Market Positioning Analysis
-   - Industry standing
-   - Market share
-   - Competitive differentiation
+export const aiService = {
+  async analyzeQuery(query: string): Promise<AnalysisResult> {
+    try {
+      const { data: embeddings } = await supabase.functions.invoke('generate-embeddings', {
+        body: { text: query }
+      });
 
-4. Thorough Risk Evaluation
-   - Operational risks
-   - Financial vulnerabilities
-   - Regulatory compliance challenges
-   - Geopolitical and economic factors
+      const { data: relevantDocs } = await supabase.rpc('match_documents', {
+        query_embedding: embeddings,
+        match_threshold: 0.78,
+        match_count: 5
+      });
 
-5. Strategic Growth Potential
-   - Expansion strategies
-   - Innovation pipeline
-   - Investment attractiveness
-   - Future market opportunities
+      const { data: analysis } = await supabase.functions.invoke('analyze-content', {
+        body: {
+          query,
+          context: relevantDocs,
+          systemPrompt
+        }
+      });
 
-6. Competitive Landscape Breakdown
-   - Direct and indirect competitors
-   - Comparative SWOT analysis
-   - Technological and strategic positioning
-
-7. Regulatory and Compliance Insights
-   - Legal framework compliance
-   - Potential regulatory challenges
-   - Governance standards
-   - Ethical business practices
-
-PRESENTATION GUIDELINES:
-- Use markdown formatting
-- Provide clear, actionable insights
-- Balance technical depth with readability
-- Highlight key findings with emphasis`;
-
-const mockAIResponse = (query: string) => {
-  return `## Analysis for: ${query}
-
-### Key Findings
-- Analyzed data from multiple sources
-- Cross-referenced information for accuracy
-- Generated insights based on available data
-
-### Recommendations
-1. Further research recommended
-2. Consider additional data sources
-3. Monitor for updates
-
-*This is a development mock response. Connect to an AI service for production use.*`;
-};
-
-export const generateAIResponse = async (messages: any[]) => {
-  try {
-    // For development, return a mock response
-    const lastMessage = messages[messages.length - 1];
-    return {
-      role: "assistant",
-      content: mockAIResponse(lastMessage.content),
-      timestamp: Date.now()
-    };
-
-    // Production code (commented out for now)
-    /*
-    const response = await fetch("/api/ai", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...messages,
-        ],
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error("AI response failed");
+      return {
+        content: marked(analysis.content),
+        confidence: analysis.confidence || 0.85,
+        sources: analysis.sources || researchSources.slice(0, 3),
+        metadata: {
+          timestamp: new Date().toISOString(),
+          category: analysis.category || 'general',
+          complexity: analysis.complexity || 1,
+          lastUpdated: new Date().toISOString()
+        }
+      };
+    } catch (error) {
+      throw new Error(`Analysis failed: ${error.message}`);
     }
+  },
 
-    const data = await response.json();
-    return data;
-    */
-  } catch (error) {
-    console.error("AI Service Error:", error);
-    throw error;
+  async validateSources(sources: string[]): Promise<boolean> {
+    return sources.every(source => researchSources.includes(source));
+  },
+
+  async getLatestMarketData(): Promise<any> {
+    const { data, error } = await supabase
+      .from('market_data')
+      .select('*')
+      .order('timestamp', { ascending: false })
+      .limit(1);
+
+    if (error) throw error;
+    return data[0];
   }
 };
 
-export const renderMarkdown = (content: string) => {
-  try {
-    return marked.parse(content, { breaks: true, gfm: true });
-  } catch (error) {
-    console.error("Markdown rendering error:", error);
-    return content;
-  }
-};
+export type { AnalysisResult };

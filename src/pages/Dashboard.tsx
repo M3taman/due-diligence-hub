@@ -1,200 +1,280 @@
 import { AIAnalyst } from "@/components/ai/AIAnalyst";
 import { Card } from "@/components/ui/card";
-import { FileText, BarChart2, Shield, Users, CreditCard } from "lucide-react";
+import { 
+  FileText, BarChart2, Shield, Users, CreditCard, Activity,
+  TrendingUp, AlertTriangle, DollarSign, Globe, Download,
+  Calendar, Filter, PieChart, Target, RefreshCw
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { Select } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LineChart, BarChart, PieChartComponent } from "@/components/ui/charts";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
-
-const features = [
-  {
-    icon: FileText,
-    title: "Comprehensive Analysis",
-    description: "Detailed due diligence reports covering all critical aspects of business evaluation"
-  },
-  {
-    icon: BarChart2,
-    title: "Real-time Insights",
-    description: "Up-to-date market data and analysis from multiple authoritative sources"
-  },
-  {
-    icon: Shield,
-    title: "Risk Assessment",
-    description: "Thorough evaluation of operational, financial, and regulatory risks"
-  }
-];
-
-// Note: These price IDs need to be replaced with your actual Stripe price IDs
-const STRIPE_PRICE_IDS = {
-  STARTER: process.env.STRIPE_PRICE_ID_STARTER || 'price_placeholder_starter',
-  PRO: process.env.STRIPE_PRICE_ID_PRO || 'price_placeholder_pro',
-  ENTERPRISE: process.env.STRIPE_PRICE_ID_ENTERPRISE || 'price_placeholder_enterprise'
-};
-
-const pricingPlans = [
-  {
-    name: "Starter",
-    price: 500,
-    period: "month",
-    features: ["Up to 5 users", "Unlimited analysis", "24/7 support"],
-    stripePriceId: STRIPE_PRICE_IDS.STARTER,
-    paypalPlanId: "P-STARTER",
-    color: "blue"
-  },
-  {
-    name: "Pro",
-    price: 1000,
-    period: "month",
-    features: ["Up to 10 users", "Priority support", "Advanced analytics"],
-    stripePriceId: STRIPE_PRICE_IDS.PRO,
-    paypalPlanId: "P-PRO",
-    color: "indigo"
-  },
-  {
-    name: "Enterprise",
-    price: null,
-    period: "month",
-    features: ["Unlimited users", "Custom integration", "Dedicated support"],
-    stripePriceId: STRIPE_PRICE_IDS.ENTERPRISE,
-    paypalPlanId: "P-ENTERPRISE",
-    color: "purple"
-  }
-];
+import { useResearchHistory } from "@/hooks/useResearchHistory";
+import { formatNumber, formatDate, formatCurrency } from "@/lib/utils";
 
 const Dashboard = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [dashboardData, setDashboardData] = useState({
+    totalAnalyses: 0,
+    riskScore: 0,
+    marketSentiment: 0,
+    complianceScore: 0,
+    recentAlerts: [],
+    keyMetrics: {
+      financialHealth: 0,
+      marketPosition: 0,
+      operationalEfficiency: 0,
+      regulatoryCompliance: 0
+    }
+  });
+  
+  const { researchHistory } = useResearchHistory();
 
-  const handleStripeCheckout = async (priceId: string) => {
+  const [dateRange, setDateRange] = useState({ from: null, to: null });
+  const [selectedMetric, setSelectedMetric] = useState('all');
+  const [chartData, setChartData] = useState(null);
+
+  const fetchChartData = async () => {
     try {
-      setIsLoading(true);
-      const user = (await supabase.auth.getUser()).data.user;
-      
-      if (!user) {
-        toast({
-          title: "Error",
-          description: "You must be logged in to make a purchase.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      console.log('Creating checkout session for price:', priceId);
-      const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
-        body: { priceId, userId: user.id },
-      });
-
-      if (error) {
-        console.error('Checkout error:', error);
-        throw error;
-      }
-      
-      if (data?.url) {
-        window.location.href = data.url;
-      }
+      const { data } = await supabase
+        .from('analysis_metrics')
+        .select('*')
+        .gte('timestamp', dateRange.from)
+        .lte('timestamp', dateRange.to);
+      setChartData(data);
     } catch (error) {
-      console.error('Checkout error:', error);
       toast({
-        title: "Error",
-        description: "Failed to initiate checkout. Please try again.",
         variant: "destructive",
+        title: "Error",
+        description: "Failed to load chart data"
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  const handlePayPalCheckout = async (planId: string) => {
+  const exportDashboard = async () => {
     try {
-      setIsLoading(true);
-      const user = (await supabase.auth.getUser()).data.user;
+      const exportData = {
+        metrics: dashboardData,
+        charts: chartData,
+        dateRange,
+        timestamp: new Date().toISOString()
+      };
       
-      if (!user) {
-        toast({
-          title: "Error",
-          description: "You must be logged in to make a purchase.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke('create-paypal-order', {
-        body: { planId, userId: user.id },
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+        type: 'application/json'
       });
-
-      if (error) throw error;
-      if (data?.id) {
-        window.location.href = `https://www.paypal.com/checkoutnow?token=${data.id}`;
-      }
-    } catch (error) {
-      console.error('PayPal checkout error:', error);
+      
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `dashboard-export-${formatDate(new Date())}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
       toast({
-        title: "Error",
-        description: "Failed to initiate PayPal checkout. Please try again.",
-        variant: "destructive",
+        title: "Export Complete",
+        description: "Dashboard data has been exported successfully"
       });
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Export Failed",
+        description: "Failed to export dashboard data"
+      });
     }
   };
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const { data } = await supabase
+          .from('dashboard_metrics')
+          .select('*')
+          .single();
+        
+        setDashboardData(data);
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load dashboard data"
+        });
+      }
+    };
+
+    fetchDashboardData();
+    const interval = setInterval(fetchDashboardData, 300000); // 5-minute refresh
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="space-y-2 mb-8">
-        <h1 className="text-4xl font-bold text-gray-900">Welcome to DueDiligence OS</h1>
-        <p className="text-xl text-gray-600">
-          Your AI-powered platform for comprehensive business intelligence and due diligence analysis
-        </p>
+    <div className="space-y-6 p-6">
+      {/* Header Section */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Due Diligence Dashboard</h1>
+          <p className="text-muted-foreground">Real-time market and company analysis</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline">
+            <FileText className="w-4 h-4 mr-2" />
+            Generate Report
+          </Button>
+          <Button>
+            <Activity className="w-4 h-4 mr-2" />
+            New Analysis
+          </Button>
+        </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3 mb-12">
-        {features.map((feature) => (
-          <Card key={feature.title} className="p-6 hover:shadow-lg transition-shadow duration-200">
-            <feature.icon className="h-12 w-12 text-primary mb-4" />
-            <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-            <p className="text-gray-600">{feature.description}</p>
-          </Card>
-        ))}
-      </div>
-
-      <div className="mb-12">
-        <AIAnalyst />
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-3 mb-8">
-        {pricingPlans.map((plan) => (
-          <Card key={plan.name} className={`p-6 bg-gradient-to-br from-${plan.color}-500 to-${plan.color}-600 text-white`}>
-            <h3 className="text-xl font-semibold mb-4">{plan.name}</h3>
-            <div className="text-3xl font-bold mb-2">
-              {plan.price ? `$${plan.price}/${plan.period}` : 'Custom'}
+      {/* Key Metrics Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-6">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-sm text-muted-foreground">Risk Score</p>
+              <h3 className="text-2xl font-bold">{dashboardData.riskScore}%</h3>
             </div>
-            <p className="mb-4">Perfect for {plan.name === "Enterprise" ? "large organizations" : "small teams"}</p>
-            <ul className="space-y-2 mb-6">
-              {plan.features.map((feature) => (
-                <li key={feature} className="flex items-center">
-                  <Users className="h-5 w-5 mr-2" />
-                  {feature}
-                </li>
+            <AlertTriangle className={`w-8 h-8 ${
+              dashboardData.riskScore > 70 ? 'text-destructive' : 'text-primary'
+            }`} />
+          </div>
+          <Progress value={dashboardData.riskScore} className="mt-2" />
+        </Card>
+
+        <Card className="p-6">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-sm text-muted-foreground">Market Sentiment</p>
+              <h3 className="text-2xl font-bold">{dashboardData.marketSentiment}%</h3>
+            </div>
+            <TrendingUp className="w-8 h-8 text-primary" />
+          </div>
+          <Progress value={dashboardData.marketSentiment} className="mt-2" />
+        </Card>
+
+        <Card className="p-6">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-sm text-muted-foreground">Compliance Score</p>
+              <h3 className="text-2xl font-bold">{dashboardData.complianceScore}%</h3>
+            </div>
+            <Shield className="w-8 h-8 text-primary" />
+          </div>
+          <Progress value={dashboardData.complianceScore} className="mt-2" />
+        </Card>
+
+        <Card className="p-6">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-sm text-muted-foreground">Total Analyses</p>
+              <h3 className="text-2xl font-bold">{formatNumber(dashboardData.totalAnalyses)}</h3>
+            </div>
+            <BarChart2 className="w-8 h-8 text-primary" />
+          </div>
+        </Card>
+      </div>
+
+      <div className="flex gap-4 items-center">
+        <DateRangePicker
+          value={dateRange}
+          onChange={setDateRange}
+          className="w-[300px]"
+        />
+        <Select
+          value={selectedMetric}
+          onValueChange={setSelectedMetric}
+          options={[
+            { value: 'all', label: 'All Metrics' },
+            { value: 'financial', label: 'Financial' },
+            { value: 'market', label: 'Market' },
+            { value: 'compliance', label: 'Compliance' }
+          ]}
+        />
+        <Button variant="outline" onClick={fetchChartData}>
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Update
+        </Button>
+        <Button variant="outline" onClick={exportDashboard}>
+          <Download className="w-4 h-4 mr-2" />
+          Export
+        </Button>
+      </div>
+
+      <Tabs defaultValue="overview">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="financial">Financial</TabsTrigger>
+          <TabsTrigger value="market">Market Analysis</TabsTrigger>
+          <TabsTrigger value="risk">Risk Assessment</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview">
+          <div className="grid grid-cols-2 gap-4">
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Trend Analysis</h3>
+              <LineChart data={chartData?.trendData} />
+            </Card>
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Risk Distribution</h3>
+              <PieChartComponent data={chartData?.riskData} />
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Add similar content for other tabs */}
+      </Tabs>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* AI Analysis Section */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">AI-Powered Analysis</h2>
+            <AIAnalyst />
+          </Card>
+        </div>
+
+        {/* Recent Activity & Alerts */}
+        <div className="space-y-6">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Recent Alerts</h2>
+            <div className="space-y-4">
+              {dashboardData.recentAlerts.map((alert, index) => (
+                <div key={index} className="flex items-start gap-4">
+                  <AlertTriangle className={`w-4 h-4 mt-1 ${
+                    alert.severity === 'high' ? 'text-destructive' : 'text-warning'
+                  }`} />
+                  <div>
+                    <p className="text-sm font-medium">{alert.message}</p>
+                    <p className="text-xs text-muted-foreground">{formatDate(alert.timestamp)}</p>
+                  </div>
+                </div>
               ))}
-            </ul>
-            <div className="space-y-2">
-              <Button
-                className="w-full bg-white text-gray-800 hover:bg-gray-100"
-                onClick={() => handleStripeCheckout(plan.stripePriceId)}
-                disabled={isLoading}
-              >
-                <CreditCard className="w-4 h-4 mr-2" />
-                Pay with Card
-              </Button>
-              <Button
-                className="w-full bg-[#0070ba] hover:bg-[#003087] text-white"
-                onClick={() => handlePayPalCheckout(plan.paypalPlanId)}
-                disabled={isLoading}
-              >
-                Pay with PayPal
-              </Button>
             </div>
           </Card>
-        ))}
+
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Recent Research</h2>
+            <div className="space-y-4">
+              {researchHistory?.slice(0, 5).map((entry) => (
+                <div key={entry.id} className="flex items-start gap-4">
+                  <FileText className="w-4 h-4 mt-1" />
+                  <div>
+                    <p className="text-sm font-medium">{entry.query}</p>
+                    <p className="text-xs text-muted-foreground">{formatDate(entry.created_at)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );

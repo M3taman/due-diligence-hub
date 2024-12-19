@@ -1,20 +1,15 @@
 export interface Message {
-  role: 'user' | 'assistant' | 'system';
+  role: 'user' | 'assistant';
   content: string;
-  timestamp: number;
-  charts?: {
-    title: string;
-    data: Array<{
-      name: string;
-      value: number;
-      [key: string]: any;
-    }>;
-  }[];
-  metadata?: {
-    complexity: number;
-    confidence: number;
-    sources: string[];
-  };
+  charts?: ChartData[];
+}
+
+export interface ChartData {
+  type: 'line' | 'area' | 'bar';
+  data: any[];
+  xKey: string;
+  yKey: string;
+  title?: string;
 }
 
 export interface ResearchEntry {

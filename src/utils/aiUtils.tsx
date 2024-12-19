@@ -1,5 +1,8 @@
 import React from 'react';
 import { marked } from "marked";
+import DOMPurify from 'dompurify';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github.css';
 
 export const researchSources = [
   "Bloomberg Terminal",
@@ -14,36 +17,79 @@ export const researchSources = [
   "PortfolioAnalyst Pro"
 ];
 
-export const renderMarkdown = (content: string) => {
+interface ChartData {
+  type: 'line' | 'area' | 'bar';
+  data: any[];
+  xKey: string;
+  yKey: string;
+  title?: string;
+}
+
+const validateChartData = (data: any): ChartData => {
+  if (!data.type || !['line', 'area', 'bar'].includes(data.type)) {
+    throw new Error('Invalid chart type');
+  }
+  if (!Array.isArray(data.data) || !data.xKey || !data.yKey) {
+    throw new Error('Invalid chart data format');
+  }
+  return {
+    type: data.type,
+    data: data.data,
+    xKey: data.xKey,
+    yKey: data.yKey,
+    title: data.title
+  };
+};
+
+export const processChartData = (content: string): ChartData[] => {
+  try {
+    const chartRegex = /```chart\n([\s\S]*?)\n```/g;
+    const charts: ChartData[] = [];
+    let match;
+
+    while ((match = chartRegex.exec(content)) !== null) {
+      try {
+        const chartData = JSON.parse(match[1]);
+        charts.push(validateChartData(chartData));
+      } catch (e) {
+        console.error('Chart data processing failed:', e);
+      }
+    }
+
+    return charts;
+  } catch (error) {
+    console.error('Chart extraction failed:', error);
+    return [];
+  }
+};
+
+export const renderMarkdown = (content: string): string => {
   try {
     marked.setOptions({
       breaks: true,
-      gfm: true
+      gfm: true,
+      highlight: (code, lang) => {
+        if (lang && hljs.getLanguage(lang)) {
+          return hljs.highlight(code, { language: lang }).value;
+        }
+        return code;
+      }
     });
     
     const html = marked.parse(content);
-    return (
-      <div 
-        className="prose prose-slate max-w-none
-          prose-headings:font-semibold 
-          prose-h1:text-2xl prose-h1:mb-4
-          prose-h2:text-xl prose-h2:mb-3
-          prose-h3:text-lg prose-h3:mb-2
-          prose-p:text-base prose-p:mb-4
-          prose-li:text-base
-          prose-table:text-sm prose-table:w-full
-          prose-td:border prose-td:p-2
-          prose-th:border prose-th:p-2 prose-th:bg-muted
-          prose-strong:text-primary
-          prose-blockquote:border-l-4 prose-blockquote:border-primary/50
-          prose-blockquote:pl-4 prose-blockquote:italic"
-        dangerouslySetInnerHTML={{ __html: html }} 
-      />
-    );
+    return DOMPurify.sanitize(html);
   } catch (error) {
-    console.error('Markdown rendering error:', error);
-    return <div>{content}</div>;
+    console.error('Markdown rendering failed:', error);
+    return 'Error rendering content';
   }
+};
+
+// Add validation helper
+export const validateAIResponse = (content: string) => {
+  if (!content || typeof content !== 'string') {
+    throw new Error('Invalid AI response format');
+  }
+  return content.trim();
 };
 
 export const formatCurrency = (value: number): string => {

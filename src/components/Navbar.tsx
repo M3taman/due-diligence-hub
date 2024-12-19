@@ -1,8 +1,26 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Database, BarChart2, FileText, Settings, LogOut, HelpCircle, Mail } from "lucide-react";
+import { 
+  Database, 
+  BarChart2, 
+  FileText, 
+  Settings, 
+  LogOut, 
+  HelpCircle, 
+  Mail,
+  Bell,
+  User,
+  Menu
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useTheme } from "@/components/providers/theme-provider";
 
 const navItems = [
   { label: "Dashboard", path: "/", icon: BarChart2 },
@@ -11,9 +29,14 @@ const navItems = [
   { label: "Settings", path: "/settings", icon: Settings },
 ];
 
-export function Navbar() {
+interface NavbarProps {
+  onMenuClick?: () => void;
+}
+
+export function Navbar({ onMenuClick }: NavbarProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
 
   const handleLogout = async () => {
     try {
@@ -33,41 +56,55 @@ export function Navbar() {
   };
 
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center px-4">
-        <div className="flex items-center gap-2 mr-8">
+    <nav className="h-16 border-b px-4 flex items-center justify-between bg-background">
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="icon" onClick={onMenuClick}>
+          <Menu className="h-5 w-5" />
+        </Button>
+        <Link to="/" className="flex items-center gap-2">
           <Database className="h-6 w-6" />
-          <span className="text-xl font-bold">dudil</span>
-        </div>
-        
-        <div className="flex gap-1 flex-1">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Button
-                key={item.path}
-                variant={isActive ? "secondary" : "ghost"}
-                asChild
-              >
-                <Link to={item.path} className="flex items-center gap-2">
-                  <item.icon className="h-4 w-4" />
-                  {item.label}
-                </Link>
-              </Button>
-            );
-          })}
-        </div>
+          <span className="font-semibold text-lg">DueDiligence OS</span>
+        </Link>
+      </div>
 
-        <div className="flex items-center gap-2">
-          <Button variant="outline" className="flex items-center gap-2">
-            <Mail className="h-4 w-4" />
-            Newsletter
-          </Button>
-          <Button variant="ghost" onClick={handleLogout} className="flex items-center gap-2">
-            <LogOut className="h-4 w-4" />
-            Logout
-          </Button>
-        </div>
+      <div className="hidden md:flex items-center gap-6">
+        {navItems.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${
+              location.pathname === item.path
+                ? "bg-primary/10 text-primary"
+                : "hover:bg-accent"
+            }`}
+          >
+            <item.icon className="h-4 w-4" />
+            <span>{item.label}</span>
+          </Link>
+        ))}
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon">
+          <Bell className="h-5 w-5" />
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <User className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem onClick={() => navigate("/settings")}>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Logout</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </nav>
   );

@@ -1,31 +1,52 @@
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
+import { Loader2 } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         if (event === 'SIGNED_IN') {
-          toast({
-            title: "Welcome back!",
-            description: "You have successfully signed in.",
-          });
-          navigate("/");
+          setIsLoading(true);
+          try {
+            // Create or update user profile
+            const { error } = await supabase
+              .from('user_profiles')
+              .upsert({
+                id: session?.user.id,
+                email: session?.user.email,
+                last_sign_in: new Date().toISOString()
+              });
+
+            if (error) throw error;
+
+            toast({
+              title: "Welcome back!",
+              description: "You have successfully signed in."
+            });
+            navigate("/dashboard");
+          } catch (error) {
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: "Failed to update profile."
+            });
+          } finally {
+            setIsLoading(false);
+          }
         } else if (event === 'SIGNED_OUT') {
           toast({
             title: "Signed out",
-            description: "You have been signed out successfully.",
+            description: "You have been signed out successfully."
           });
-        } else if (event === 'USER_UPDATED') {
-          console.log('User updated:', session);
         }
       }
     );
@@ -34,60 +55,59 @@ const Login = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-muted/50">
       <Card className="w-full max-w-md p-8">
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold">DueDiligence OS</h1>
-          <p className="text-gray-600">Sign in to access your account</p>
+          <h1 className="text-2xl font-bold">Welcome to dudil</h1>
+          <p className="text-muted-foreground">
+            Sign in to access your due diligence workspace
+          </p>
         </div>
-        <Auth
-          supabaseClient={supabase}
-          appearance={{
-            theme: ThemeSupa,
-            variables: {
-              default: {
-                colors: {
-                  brand: '#3B82F6',
-                  brandAccent: '#2563EB',
+
+        {isLoading ? (
+          <div className="flex justify-center p-4">
+            <Loader2 className="h-6 w-6 animate-spin" />
+          </div>
+        ) : (
+          <Auth
+            supabaseClient={supabase}
+            appearance={{
+              theme: ThemeSupa,
+              variables: {
+                default: {
+                  colors: {
+                    brand: 'rgb(var(--primary))',
+                    brandAccent: 'rgb(var(--primary-foreground))'
+                  }
                 }
               }
-            },
-            style: {
-              button: {
-                borderRadius: '0.375rem',
-                height: '2.5rem',
-              },
-              input: {
-                borderRadius: '0.375rem',
-              },
-              message: {
-                borderRadius: '0.375rem',
-                padding: '0.75rem',
+            }}
+            providers={["google", "github"]}
+            redirectTo={`${window.location.origin}/auth/callback`}
+            onlyThirdPartyProviders={false}
+            localization={{
+              variables: {
+                sign_in: {
+                  email_label: "Email address",
+                  password_label: "Password"
+                }
               }
-            }
-          }}
-          providers={[]}
-          localization={{
-            variables: {
-              sign_in: {
-                email_label: 'Email address',
-                password_label: 'Password',
-                button_label: 'Sign in',
-                loading_button_label: 'Signing in...',
-                social_provider_text: 'Sign in with {{provider}}',
-                link_text: "Don't have an account? Sign up"
-              },
-              sign_up: {
-                email_label: 'Email address',
-                password_label: 'Create a password',
-                button_label: 'Sign up',
-                loading_button_label: 'Signing up...',
-                social_provider_text: 'Sign up with {{provider}}',
-                link_text: "Already have an account? Sign in"
-              }
-            }
-          }}
-        />
+            }}
+          />
+        )}
+
+        <div className="mt-6 text-center text-sm text-muted-foreground">
+          <p>
+            By signing in, you agree to our{" "}
+            <a href="/terms" className="underline hover:text-primary">
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a href="/privacy" className="underline hover:text-primary">
+              Privacy Policy
+            </a>
+          </p>
+        </div>
       </Card>
     </div>
   );

@@ -27,48 +27,59 @@ export const useAIAnalysis = () => {
     const userMessage = {
       role: 'user' as const,
       content: query,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      status: 'complete' as const
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setIsLoading(true);
-
     try {
-      const { data, error } = await supabase.functions.invoke('analyze-investment', {
-        body: { query }
+      setIsLoading(true);
+      setMessages(prev => [...prev, userMessage]);
+
+      const complexity = calculateComplexity(query);
+      
+      const { data: analysisResponse, error } = await supabase.functions.invoke('analyze', {
+        body: { 
+          query,
+          complexity,
+          history: messages.slice(-5)
+        }
       });
 
       if (error) throw error;
 
-      const analysis = data.analysis;
-      const aiResponse = {
+      const aiMessage = {
         role: 'assistant' as const,
-        content: analysis,
-        timestamp: Date.now()
+        content: analysisResponse.content,
+        timestamp: Date.now(),
+        status: 'complete' as const
       };
 
-      setMessages(prev => [...prev, aiResponse]);
-
-      const { data: { session } } = await supabase.auth.getSession();
+      setMessages(prev => [...prev, aiMessage]);
       
-      if (session?.user) {
-        await addResearchEntry.mutateAsync({
-          query,
-          response: analysis,
-          user_id: session.user.id,
-          metadata: {
-            tokens: analysis.split(' ').length,
-            complexity: calculateComplexity(analysis)
-          }
-        });
-      }
-
-      toast({
-        title: "Analysis Complete",
-        description: "Your investment analysis report has been generated.",
+      await addResearchEntry({
+        query,
+        response: analysisResponse.content,
+        complexity,
+        timestamp: new Date().toISOString()
       });
+
     } catch (error) {
-      handleError(error);
+      const errorMessage = handleError(error);
+      toast({
+        variant: "destructive",
+        title: "Analysis Error",
+        description: errorMessage
+      });
+
+      setMessages(prev => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: `Error: ${errorMessage}`,
+          timestamp: Date.now(),
+          status: 'error'
+        }
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -77,6 +88,6 @@ export const useAIAnalysis = () => {
   return {
     messages,
     isLoading,
-    handleSendMessage,
+    handleSendMessage
   };
 };

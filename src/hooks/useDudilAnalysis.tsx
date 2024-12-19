@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Message } from "@/types/ai";
 import { useToast } from "@/components/ui/use-toast";
 import { useResearchHistory } from "@/hooks/useResearchHistory";
@@ -22,63 +22,103 @@ export const useDudilAnalysis = () => {
       text.toLowerCase().includes(term.toLowerCase()) ? score + 1 : score, 0);
   };
 
-  const handleSendMessage = async (query: string) => {
+  const handleSendMessage = useCallback(async (query: string) => {
     if (isLoading) return;
 
-    const userMessage = {
-      role: 'user' as const,
+    const userMessage: Message = {
+      role: 'user',
       content: query,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      status: 'complete'
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setIsLoading(true);
-
     try {
-      const { data, error } = await supabase.functions.invoke('analyze-investment', {
-        body: { query }
+      setIsLoading(true);
+      setMessages(prev => [...prev, userMessage]);
+
+      const complexity = calculateComplexity(query);
+      
+      const { data: analysisData, error } = await supabase.functions.invoke('dudil-analyze', {
+        body: {
+          query,
+          complexity,
+          context: messages.slice(-5),
+          timestamp: new Date().toISOString()
+        }
       });
 
       if (error) throw error;
 
-      const analysis = data.analysis;
-      const aiResponse = {
-        role: 'assistant' as const,
-        content: analysis,
+      const aiMessage: Message = {
+        role: 'assistant',
+        content: analysisData.response,
         timestamp: Date.now(),
-        charts: data.charts
+        status: 'complete',
+        metadata: {
+          complexity,
+          sources: analysisData.sources,
+          confidence: analysisData.confidence
+        }
       };
 
-      setMessages(prev => [...prev, aiResponse]);
+      setMessages(prev => [...prev, aiMessage]);
 
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        await addResearchEntry.mutateAsync({
-          query,
-          response: analysis,
-          user_id: session.user.id,
-          metadata: {
-            tokens: analysis.split(' ').length,
-            complexity: calculateComplexity(analysis)
-          }
-        });
-      }
-
-      toast({
-        title: "Analysis Complete",
-        description: "Your investment analysis report has been generated.",
+      await addResearchEntry({
+        query,
+        response: analysisData.response,
+        complexity,
+        sources: analysisData.sources,
+        timestamp: new Date().toISOString()
       });
+
     } catch (error) {
-      handleError(error);
+      const errorMessage = handleError(error);
+      toast({
+        variant: "destructive",
+        title: "Analysis Failed",
+        description: errorMessage
+      });
+
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `Error: ${errorMessage}`,
+        timestamp: Date.now(),
+        status: 'error'
+      }]);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isLoading, messages, addResearchEntry, toast]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('dudil_updates')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'analysis_history' },
+        (payload) => {
+          if (payload.new && payload.new.response) {
+            const newMessage: Message = {
+              role: 'assistant',
+              content: payload.new.response,
+              timestamp: Date.now(),
+              status: 'complete',
+              metadata: payload.new.metadata
+            };
+            setMessages(prev => [...prev, newMessage]);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   return {
     messages,
     isLoading,
-    handleSendMessage,
+    handleSendMessage
   };
 };

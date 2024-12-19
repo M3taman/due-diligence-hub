@@ -32,6 +32,16 @@ export const AppRoutes = () => {
         }
       />
       <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Settings />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/faq"
         element={
           <ProtectedRoute>
@@ -42,13 +52,23 @@ export const AppRoutes = () => {
         }
       />
       <Route
-        path="/settings"
+        path="/analysis/:symbol"
         element={
           <ProtectedRoute>
             <Layout>
-              <Settings />
+              <Research />
             </Layout>
           </ProtectedRoute>
+        }
+      />
+      <Route
+        path="*"
+        element={
+          <Layout>
+            <div className="flex items-center justify-center h-full">
+              <h1 className="text-2xl font-bold">404 - Page Not Found</h1>
+            </div>
+          </Layout>
         }
       />
     </Routes>
