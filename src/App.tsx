@@ -5,7 +5,6 @@ import { AppRoutes } from "@/components/routing/AppRoutes";
 import { Loading } from '@/components/ui/loading';
 import { Toaster } from '@/components/ui/toaster';
 import { Analytics } from '@/components/analytics/Analytics';
-
 const App = () => {
   return (
     <ErrorBoundary>

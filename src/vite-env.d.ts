@@ -9,6 +9,8 @@ interface ImportMetaEnv {
   readonly VITE_SEC_API_KEY: string
   readonly VITE_ESG_API_KEY: string
   readonly VITE_ENV: 'development' | 'production' | 'test'
+  readonly VITE_GA_ID: string;
+  readonly VITE_MIXPANEL_ID: string;
 }
 
 interface ImportMeta {

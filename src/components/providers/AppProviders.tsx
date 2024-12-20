@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { BrowserRouter } from "react-router-dom";
 import React from 'react';
-import { ThemeProvider } from './theme-provider';
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,7 +28,7 @@ export function AppProviders({ children }: AppProvidersProps) {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <ThemeProvider defaultTheme="system" storageKey="ui-theme">
+          <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
             {children}
           </ThemeProvider>
         </BrowserRouter>

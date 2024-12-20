@@ -8,17 +8,13 @@ type ThemeProviderProps = {
   storageKey?: string
 }
 
-type ThemeProviderState = {
+const ThemeProviderContext = createContext<{
   theme: Theme
   setTheme: (theme: Theme) => void
-}
-
-const initialState: ThemeProviderState = {
+}>({
   theme: "system",
   setTheme: () => null,
-}
-
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
+})
 
 export function ThemeProvider({
   children,
@@ -39,6 +35,7 @@ export function ThemeProvider({
         .matches
         ? "dark"
         : "light"
+
       root.classList.add(systemTheme)
       return
     }

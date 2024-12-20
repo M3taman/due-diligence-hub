@@ -5,13 +5,11 @@ import { AlertCircle } from 'lucide-react';
 
 interface Props {
   children: ReactNode;
-  fallback?: ReactNode;
 }
 
 interface State {
   hasError: boolean;
   error?: Error;
-  errorInfo?: ErrorInfo;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -24,7 +22,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    console.error('Error caught by boundary:', error, errorInfo);
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
     // Add error reporting service here
   }
 
@@ -34,19 +32,13 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public render(): ReactNode {
     if (this.state.hasError) {
-      return this.props.fallback || (
-        <Card className="p-6 m-4 border-destructive">
-          <div className="flex items-center gap-2 mb-4">
-            <AlertCircle className="w-5 h-5 text-destructive" />
-            <h2 className="text-lg font-semibold">Something went wrong</h2>
+      return (
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold">Something went wrong</h1>
+            <p className="mt-2 text-muted-foreground">{this.state.error?.message}</p>
           </div>
-          <p className="mb-4 text-muted-foreground">
-            {this.state.error?.message || 'An unexpected error occurred'}
-          </p>
-          <Button onClick={this.handleReset} variant="outline">
-            Try again
-          </Button>
-        </Card>
+        </div>
       );
     }
 
