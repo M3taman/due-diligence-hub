@@ -1,24 +1,55 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfileSettings } from "@/components/settings/ProfileSettings";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard, Bell, Key, Shield, Users, Copy, Eye, EyeOff } from "lucide-react";
+import { CreditCard, Bell, Key, Shield, Users, Copy, Eye, EyeOff, Moon, Sun, Trash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useTheme } from "@/components/providers/theme-provider";
+import { Label } from "@/components/ui/label";
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const { toast } = useToast();
   const [apiKey, setApiKey] = useState("sk_test_123456789");
   const [showApiKey, setShowApiKey] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [notifications, setNotifications] = useState({
+    email: true,
+    push: false
+  });
 
   const copyApiKey = () => {
     navigator.clipboard.writeText(apiKey);
     toast({ title: "API key copied to clipboard" });
+  };
+
+  const handleNotificationChange = (type: keyof typeof notifications) => {
+    setNotifications(prev => ({
+      ...prev,
+      [type]: !prev[type]
+    }));
+    toast({
+      title: "Settings updated",
+      description: "Your notification preferences have been saved."
+    });
+  };
+
+  const handleThemeChange = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+  };
+
+  const handleDeleteAccount = () => {
+    // Add confirmation dialog and deletion logic
+    toast({
+      variant: "destructive",
+      title: "Are you sure?",
+      description: "This action cannot be undone."
+    });
   };
 
   return (
@@ -87,7 +118,30 @@ const Settings = () => {
                 </div>
                 <Switch />
               </div>
-              {/* Add more notification settings */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label>Email Notifications</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receive updates via email
+                  </p>
+                </div>
+                <Switch
+                  checked={notifications.email}
+                  onCheckedChange={() => handleNotificationChange("email")}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label>Push Notifications</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receive push notifications
+                  </p>
+                </div>
+                <Switch
+                  checked={notifications.push}
+                  onCheckedChange={() => handleNotificationChange("push")}
+                />
+              </div>
             </div>
           </Card>
         </TabsContent>
@@ -152,6 +206,49 @@ const Settings = () => {
               </Button>
               {/* Add team member list and management */}
             </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="appearance">
+          <Card>
+            <CardHeader>
+              <CardTitle>Appearance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label>Theme</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Switch between light and dark mode
+                  </p>
+                </div>
+                <Button variant="outline" size="icon" onClick={handleThemeChange}>
+                  {theme === "light" ? (
+                    <Moon className="h-4 w-4" />
+                  ) : (
+                    <Sun className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="danger">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-destructive">Danger Zone</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteAccount}
+                className="w-full"
+              >
+                <Trash className="w-4 h-4 mr-2" />
+                Delete Account
+              </Button>
+            </CardContent>
           </Card>
         </TabsContent>
       </Tabs>

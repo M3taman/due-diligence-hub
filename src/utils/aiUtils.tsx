@@ -1,10 +1,9 @@
-import React from 'react';
-import { marked } from "marked";
-import DOMPurify from 'dompurify';
-import hljs from 'highlight.js';
-import 'highlight.js/styles/github.css';
+import { marked } from 'marked'
+import DOMPurify from 'dompurify'
+import hljs from 'highlight.js'
+import type { ProcessedContent } from '@/types/chat'
 
-export const researchSources = [
+export const DATA_SOURCES = [
   "Bloomberg Terminal",
   "Refinitiv Eikon",
   "FactSet",
@@ -15,7 +14,7 @@ export const researchSources = [
   "MSCI Analytics",
   "BlackRock Aladdin",
   "PortfolioAnalyst Pro"
-];
+] as const
 
 interface ChartData {
   type: 'line' | 'area' | 'bar';

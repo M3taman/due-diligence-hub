@@ -1,133 +1,80 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
-import { ArrowRight, CheckCircle, Shield, BarChart2, FileText, Zap, Lock, Globe } from "lucide-react";
+import { useNavigate } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ChevronRight, BarChart2, Shield, Zap, Search } from 'lucide-react'
 
-const Index = () => {
-  const navigate = useNavigate();
+export function Index() {
+  const navigate = useNavigate()
 
   const features = [
     {
-      icon: Shield,
-      title: "Due Diligence Analysis",
-      description: "AI-powered comprehensive business evaluation and risk assessment"
+      title: "Real-time Analysis",
+      description: "Get instant insights with our AI-powered analysis engine",
+      icon: <BarChart2 className="h-6 w-6" />
     },
     {
-      icon: BarChart2,
-      title: "Market Intelligence",
-      description: "Real-time data and insights from authoritative sources"
+      title: "Comprehensive Coverage",
+      description: "Deep dive into financial, market, and regulatory aspects",
+      icon: <Search className="h-6 w-6" />
     },
     {
-      icon: FileText,
-      title: "Research Reports",
-      description: "Professional-grade documentation and analysis"
+      title: "Risk Management",
+      description: "Identify and assess potential risks early",
+      icon: <Shield className="h-6 w-6" />
     },
     {
-      icon: Zap,
-      title: "Instant Analysis",
-      description: "Get insights in seconds, not days"
+      title: "Fast Processing",
+      description: "Quick and efficient due diligence process",
+      icon: <Zap className="h-6 w-6" />
     }
-  ];
-
-  const testimonials = [
-    {
-      quote: "dudil has transformed our due diligence process, saving us countless hours.",
-      author: "Sarah Chen",
-      role: "Investment Director",
-      company: "Global Ventures Ltd"
-    },
-    {
-      quote: "The AI-powered insights have helped us identify risks we might have missed.",
-      author: "Michael Stewart",
-      role: "M&A Partner",
-      company: "Sterling Advisory"
-    }
-  ];
+  ]
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="py-20 px-6">
-        <div className="container mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-6">
-            Next-Generation Due Diligence Platform
-          </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Streamline your due diligence process with AI-powered insights and real-time market intelligence.
-          </p>
-          <div className="flex gap-4 justify-center">
-            <Button size="lg" onClick={() => navigate('/signup')}>
-              Get Started
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/demo')}>
-              Request Demo
-            </Button>
+    <div className="flex min-h-screen flex-col">
+      <main className="flex-1">
+        <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
+          <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
+            <h1 className="text-3xl font-bold sm:text-5xl md:text-6xl lg:text-7xl">
+              Smart Due Diligence
+              <br className="hidden sm:inline" />
+              Made Simple
+            </h1>
+            <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
+              Automate your due diligence process with AI-powered analysis and comprehensive reporting
+            </p>
+            <div className="space-x-4">
+              <Button size="lg" onClick={() => navigate('/login')}>
+                Get Started <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="lg" onClick={() => navigate('/demo')}>
+                View Demo
+              </Button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Features Grid */}
-      <section className="py-16 bg-muted/50">
-        <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            Powerful Features for Modern Due Diligence
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <section className="container space-y-6 py-8 md:py-12 lg:py-24">
+          <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-2">
             {features.map((feature, index) => (
-              <Card key={index} className="p-6 hover:shadow-lg transition-shadow">
-                <feature.icon className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-16">
-        <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            Trusted by Industry Leaders
-          </h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="p-8">
-                <blockquote className="text-lg mb-4">{testimonial.quote}</blockquote>
-                <div>
-                  <cite className="font-semibold">{testimonial.author}</cite>
+              <Card key={index}>
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    {feature.icon}
+                    <CardTitle>{feature.title}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
                   <p className="text-muted-foreground">
-                    {testimonial.role}, {testimonial.company}
+                    {feature.description}
                   </p>
-                </div>
+                </CardContent>
               </Card>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-6">
-            Ready to Transform Your Due Diligence Process?
-          </h2>
-          <p className="text-xl mb-8 opacity-90">
-            Join leading firms using dudil to make better investment decisions.
-          </p>
-          <Button
-            size="lg"
-            variant="secondary"
-            onClick={() => navigate('/signup')}
-          >
-            Start Free Trial
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        </div>
-      </section>
+        </section>
+      </main>
     </div>
-  );
-};
+  )
+}
 
-export default Index;
+export default Index

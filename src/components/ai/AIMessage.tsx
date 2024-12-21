@@ -1,15 +1,15 @@
-import { Card } from "@/components/ui/card";
-import { Message } from "@/types/ai";
-import { renderMarkdown } from "@/utils/aiUtils";
-import { ChartProvider } from '../charts/ChartContext';
-import { ChartRenderer } from '../charts/ChartRenderer';
+import { Card } from "@/components/ui/card"
+import type { Message } from "@/types/chat"
+import { renderMarkdown } from "@/utils/aiUtils"
+import { ChartProvider } from '../charts/ChartContext'
+import { ChartRenderer } from '../charts/ChartRenderer'
 
 interface AIMessageProps {
-  message: Message;
+  message: Message
 }
 
 export const AIMessage = ({ message }: AIMessageProps) => {
-  const processedContent = renderMarkdown(message.content);
+  const processedContent = renderMarkdown(message.content)
 
   return (
     <ChartProvider>
@@ -26,5 +26,5 @@ export const AIMessage = ({ message }: AIMessageProps) => {
         ))}
       </Card>
     </ChartProvider>
-  );
-};
+  )
+}

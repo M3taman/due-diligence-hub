@@ -332,31 +332,17 @@ async function generateExecutiveSummary(data: any) {
 - **Investment Thesis**: Based on comprehensive analysis of financial metrics, market position, and growth potential`;
 }
 
-async function generateFinancialAnalysis(data: any) {
-  const { financials } = data;
-  return `
-### Revenue Analysis
-- YoY Growth: ${financials.revenueGrowth}%
-- 5-Year CAGR: ${financials.revenueCAGR}%
-- Revenue Mix: ${financials.revenueSplit}
-
-### Profitability Metrics
-- Gross Margin: ${financials.grossMargin}%
-- Operating Margin: ${financials.operatingMargin}%
-- Net Margin: ${financials.netMargin}%`;
-}
-
 function generateCompanyOverview(query: string, marketData: any) {
   return `
-### Corporatel Structure
-- Founded: ${1960 + Math.floor(Math.random() * 50)}
-- Headquarters:e ${['New York', 'London', 'Tokyo', 'Singapore'][Math.floor(Math.random() * 4)]}
-- Employees: ${(Math.floor(Math.random() * 50) + 10) * 1000}
+### Corporate Structure
+- Founded: ${marketData.Founded}
+- Headquarters: ${marketData.Headquarters}
+- Employees: ${marketData.Employees}
 
 ### Leadership Assessment
-- CEO Tenure:  ${Math.floor(Math.random() * 10) + 3} years
-- Board Independence:s ${Math.floor(Math.random() * 20) + 80}%
-- Executive Compensation Alignment: ${['Strong', 'Moderate', 'Needs Improvement'][Math.floor(Math.random() * 3)]}`;
+- CEO Tenure: ${marketData.CEOTenure} years
+- Board Independence: ${marketData.BoardIndependence}%
+- Executive Compensation Alignment: ${marketData.CompensationAlignment}`;
 }
 
 function generateMarketAnalysis(marketData: z.infer<typeof MarketMetrics>) {
@@ -418,14 +404,14 @@ ${generateSWOTAnalysis()}
 function generateComplianceAnalysis(marketData: any) {
   return `
 ### Regulatory Framework
-- Compliance Score: ${Math.floor(Math.random() * 10) + 90}/100
-- Recent Violations: ${Math.floor(Math.random() * 3)}
-- Regulatory Changes Impact: ${['Low', 'Moderate', 'High'][Math.floor(Math.random() * 3)]}
+- Compliance Score: ${marketData.ComplianceScore}/100
+- Recent Violations: ${marketData.RecentViolations}
+- Regulatory Changes Impact: ${marketData.RegulatoryImpact}
 
 ### Governance Standards
-- Board Structure: ${generateBoardStructure()}
-- Shareholder Rights: ${['Strong', 'Adequate', 'Needs Improvement'][Math.floor(Math.random() * 3)]}
-- Ethics Program: ${['Comprehensive', 'Adequate', 'Basic'][Math.floor(Math.random() * 3)]}`;
+- Board Structure: ${generateBoardStructure(marketData)}
+- Shareholder Rights: ${marketData.ShareholderRights}
+- Ethics Program: ${marketData.EthicsProgram}`;
 }
 
 function generateInvestmentConsiderations(marketData: any) {

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["DOM", "DOM.Iterable", "ES2020"],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -13,9 +13,8 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "composite": true,
-    "module": "commonjs",
-    "emitDeclarationOnly": true
-    "noEmit": false
+    "emitDeclarationOnly": true,
+    "noEmit": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
@@ -31,8 +30,6 @@
     "tests",
     "vite.config.ts",
     ".eslintrc.cjs"
-  ],
-  "references": [
-    { "path": "./tsconfig.node.json" }
-  ]
+, "src/lib/supabase/client.ts"  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { Dashboard } from "@/pages/Dashboard";
 import { Research } from "@/pages/Research";
-import { Settings } from "@/pages/Settings";
+import Settings from "@/pages/Settings";
 import { FAQ } from "@/pages/FAQ";
 import { Login } from "@/pages/Login";
 import { ProtectedRoute } from "./ProtectedRoute";

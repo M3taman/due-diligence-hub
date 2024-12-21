@@ -1,116 +1,96 @@
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Card } from "@/components/ui/card";
-import { toast } from "@/components/ui/use-toast";
-import { Loader2 } from "lucide-react";
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { supabase } from '@/lib/supabase'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { toast } from "@/hooks/use-toast"
+import { Loading } from "@/components/ui/loading"
 
-const Login = () => {
-  const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
+export function Login() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN') {
-          setIsLoading(true);
-          try {
-            // Create or update user profile
-            const { error } = await supabase
-              .from('user_profiles')
-              .upsert({
-                id: session?.user.id,
-                email: session?.user.email,
-                last_sign_in: new Date().toISOString()
-              });
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
 
-            if (error) throw error;
+    try {
+      const { data: { session }, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
 
-            toast({
-              title: "Welcome back!",
-              description: "You have successfully signed in."
-            });
-            navigate("/dashboard");
-          } catch (error) {
-            toast({
-              variant: "destructive",
-              title: "Error",
-              description: "Failed to update profile."
-            });
-          } finally {
-            setIsLoading(false);
-          }
-        } else if (event === 'SIGNED_OUT') {
+      if (error) throw error
+
+      if (session) {
+        try {
+          const { error } = await supabase
+            .from('user_profiles')
+            .upsert({
+              id: session.user.id,
+              email: session.user.email,
+              last_sign_in: new Date().toISOString()
+            })
+
+          if (error) throw error
+
           toast({
-            title: "Signed out",
-            description: "You have been signed out successfully."
-          });
+            title: "Welcome back!",
+            description: "You have successfully signed in."
+          })
+          navigate("/dashboard")
+        } catch (error) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to update profile."
+          })
         }
       }
-    );
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Authentication failed",
+        description: error instanceof Error ? error.message : "Failed to sign in"
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-muted/50">
-      <Card className="w-full max-w-md p-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold">Welcome to dudil</h1>
-          <p className="text-muted-foreground">
-            Sign in to access your due diligence workspace
-          </p>
-        </div>
-
-        {isLoading ? (
-          <div className="flex justify-center p-4">
-            <Loader2 className="h-6 w-6 animate-spin" />
-          </div>
-        ) : (
-          <Auth
-            supabaseClient={supabase}
-            appearance={{
-              theme: ThemeSupa,
-              variables: {
-                default: {
-                  colors: {
-                    brand: 'rgb(var(--primary))',
-                    brandAccent: 'rgb(var(--primary-foreground))'
-                  }
-                }
-              }
-            }}
-            providers={["google", "github"]}
-            redirectTo={`${window.location.origin}/auth/callback`}
-            onlyThirdPartyProviders={false}
-            localization={{
-              variables: {
-                sign_in: {
-                  email_label: "Email address",
-                  password_label: "Password"
-                }
-              }
-            }}
-          />
-        )}
-
-        <div className="mt-6 text-center text-sm text-muted-foreground">
-          <p>
-            By signing in, you agree to our{" "}
-            <a href="/terms" className="underline hover:text-primary">
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a href="/privacy" className="underline hover:text-primary">
-              Privacy Policy
-            </a>
-          </p>
-        </div>
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <Card className="w-[350px]">
+        <CardHeader>
+          <CardTitle>Login</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+              />
+              <Input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? <Loading size="sm" /> : "Sign In"}
+            </Button>
+          </form>
+        </CardContent>
       </Card>
     </div>
-  );
-};
-
-export default Login;
+  )
+}

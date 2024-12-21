@@ -35,11 +35,10 @@ serve(async (req) => {
     querySchema.parse({ query });
 
     const marketData = await fetchMarketData(query);
-    const analysis = generateAnalysis(query, marketData);
-    const charts = generateCharts(Array(30).fill(null).map(() => fetchMarketData(query)));
+    const analysis = await generateAnalysis(query, user.id);
 
     return new Response(
-      JSON.stringify({ analysis, charts }),
+      JSON.stringify({ analysis, marketData }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {

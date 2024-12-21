@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { BrowserRouter } from "react-router-dom";
 import React from 'react';
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { SupabaseProvider } from "@/lib/supabase";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -13,6 +14,7 @@ const queryClient = new QueryClient({
       cacheTime: 10 * 60 * 1000,
       retry: 1,
       refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
     },
   },
 });
@@ -24,15 +26,17 @@ interface AppProvidersProps {
 export function AppProviders({ children }: AppProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-            {children}
+      <BrowserRouter>
+        <SupabaseProvider>
+          <ThemeProvider defaultTheme="system" storageKey="app-theme">
+            <TooltipProvider>
+              {children}
+              <Toaster />
+              <Sonner />
+            </TooltipProvider>
           </ThemeProvider>
-        </BrowserRouter>
-      </TooltipProvider>
+        </SupabaseProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 };
