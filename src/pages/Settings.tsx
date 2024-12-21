@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, Bell, Key, Shield, Users, Copy, Eye, EyeOff, Moon, Sun, Trash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/lib/supabase';
 import { useTheme } from "@/components/providers/theme-provider";
 import { Label } from "@/components/ui/label";
 

@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { BarChart2, FileText, Settings, Users, ChevronLeft, Sun, Moon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "@/components/providers/theme-provider";

@@ -9,7 +9,7 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { FileText, BarChart2, Shield, Users, CreditCard, Activity, TrendingUp, AlertTriangle, DollarSign, Globe, Download, Calendar, Filter, PieChart, Target, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { toast } from "@/hooks/use-toast";
 import { useResearchHistory } from "@/hooks/useResearchHistory";
 import { formatNumber, formatDate, formatCurrency } from "@/lib/utils";

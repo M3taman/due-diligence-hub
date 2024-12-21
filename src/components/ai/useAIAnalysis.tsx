@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Message } from "@/types/ai";
 import { useToast } from "@/components/ui/use-toast";
 import { useResearchHistory } from "@/hooks/useResearchHistory";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { handleError } from "@/utils/errorHandling";
 
 export const useAIAnalysis = () => {

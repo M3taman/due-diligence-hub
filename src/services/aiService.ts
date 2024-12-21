@@ -1,5 +1,5 @@
 import { marked } from "marked";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 
 interface AnalysisResult {
   content: string;

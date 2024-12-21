@@ -1,69 +1,83 @@
-# Welcome to your Lovable project
+# Due Diligence Hub
 
-## Project info
+AI-powered financial analysis and due diligence platform for investment research.
 
-**URL**: https://lovable.dev/projects/3609f4d9-a92d-4d94-a86f-fd366766111e
+## Features
 
-## How can I edit this code?
+- 🤖 AI-Driven Analysis
+- 📊 Real-time Market Data
+- 📑 Research Management
+- 📈 Performance Tracking
+- 🔒 Secure Authentication
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- **Frontend:** React, TypeScript, Tailwind CSS
+- **Backend:** Supabase
+- **AI/ML:** OpenAI, LangChain
+- **Data:** Polygon.io, Alpha Vantage
+- **Authentication:** Supabase Auth
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/3609f4d9-a92d-4d94-a86f-fd366766111e) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js 18+ ([install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
+- Git
+- Supabase CLI
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Installation
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/due-diligence-hub.git
 
-Follow these steps:
+# Navigate to project directory
+cd due-diligence-hub
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Install dependencies
+npm install
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Set up environment variables
+cp .env.example .env.local
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
-```
 
-**Edit a file directly in GitHub**
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_key
+VITE_OPENAI_API_KEY=your_openai_key
+VITE_POLYGON_API_KEY=your_polygon_key
 
-**Use GitHub Codespaces**
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## What technologies are used for this project?
+npm run dev        # Start development server
+npm run build      # Build for production
+npm run test       # Run tests
+npm run lint       # Lint code
 
-This project is built with .
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+src/
+├── components/    # UI components
+├── pages/         # Route pages
+├── lib/          # Shared utilities
+├── hooks/        # Custom React hooks
+└── styles/       # Global styles
 
-## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/3609f4d9-a92d-4d94-a86f-fd366766111e) and click on Share -> Publish.
+Authentication
+OAuth providers (Google, GitHub)
+Trial access system
+Role-based authorization
+Contributing
+Create feature branch
+Make changes
+Submit pull request
+License
+MIT License - see LICENSE file for details
 
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+Support
+Documentation: /docs
+Issues: GitHub Issues
+Email: support@dudil.com
