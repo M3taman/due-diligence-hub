@@ -73,19 +73,18 @@ const faqData = {
 };
 
 export function FAQ() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const navigate = useNavigate()
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState("general");
+  const navigate = useNavigate();
 
   const filterFaqs = (faqs: typeof faqData.general) => {
     return faqs.filter(faq => 
       faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      faq.answer.toLowerCase().includes(searchQuery.toLowerCase()
-      ));
-    }
+      faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  };
 
-  function setActiveCategory(value: string): void {
-    throw new Error("Function not implemented.");
-  }
+  const filteredFaqs = filterFaqs(faqData[activeCategory]);
 
   return (
     <div className="container mx-auto py-8 space-y-8">
