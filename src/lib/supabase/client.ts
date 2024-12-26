@@ -15,8 +15,6 @@ localStorage.removeItem('sb-zdmdetvaodkrvbohvjzs-auth-token')
 export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
   auth: {
     persistSession: true,
-    storageKey: 'sb-zdmdetvaodkrvbohvjzs-auth-token',
-    storage: window.localStorage,
     autoRefreshToken: true,
     detectSessionInUrl: false
   },
@@ -39,3 +37,16 @@ supabase.auth.onAuthStateChange((event, session) => {
 })
 
 export type SupabaseClient = typeof supabase
+
+// Remove fetch.ts as we're using Supabase client directly
+// Usage example:
+export const getUserProfile = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single()
+
+  if (error) throw error
+  return data
+}

@@ -1,7 +1,7 @@
 export const AUTH_CONFIG = {
   TRIAL_DURATION: 7 * 24 * 60 * 60 * 1000,
   ROUTES: {
-    PUBLIC: ['/', '/about', '/login', '/signup'],
+    PUBLIC: ['/', '/about', '/signup'],
     TRIAL: ['/dashboard', '/research'],
     PROTECTED: ['/premium', '/analysis']
   },
@@ -10,3 +10,7 @@ export const AUTH_CONFIG = {
     PREMIUM: ['advanced-analysis', 'export', 'team-access']
   }
 } as const
+
+export const AUTH_ROLES = {
+  TRIAL: "trial"
+}

@@ -3,52 +3,32 @@ import { AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-interface Props {
+interface ErrorBoundaryProps {
   children: ReactNode
 }
 
-interface State {
+interface ErrorBoundaryState {
   hasError: boolean
-  error?: Error
+  error: Error | null
 }
 
-export class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props)
+    this.state = { hasError: false, error: null }
   }
 
-  public static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error }
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo)
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Uncaught error:', error, errorInfo)
   }
 
-  private handleRetry = () => {
-    this.setState({ hasError: false, error: undefined })
-  }
-
-  public render() {
+  render() {
     if (this.state.hasError) {
-      return (
-        <div className="flex min-h-screen items-center justify-center p-4">
-          <Card className="w-[400px]">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-destructive" />
-                Something went wrong
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                {this.state.error?.message}
-              </p>
-              <Button onClick={this.handleRetry}>Try Again</Button>
-            </CardContent>
-          </Card>
-        </div>
-      )
+      return <h1>Something went wrong.</h1>;
     }
 
     return this.props.children

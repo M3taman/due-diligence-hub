@@ -43,7 +43,7 @@ export function Index() {
               Automate your due diligence process with AI-powered analysis and comprehensive reporting
             </p>
             <div className="space-x-4">
-              <Button size="lg" onClick={() => navigate('/login')}>
+              <Button size="lg" onClick={() => navigate('/')}>
                 Get Started <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
               <Button variant="outline" size="lg" onClick={() => navigate('/demo')}>

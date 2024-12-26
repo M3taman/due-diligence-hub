@@ -3,7 +3,7 @@
     // Enable project references
     "composite": true,
     // Specify ECMAScript target version
-    "target": "ES2022",
+    "target": "ESNext",
     // Specify library files to be included in the compilation
     "lib": ["ES2023", "DOM"],
     // Specify module code generation
@@ -49,7 +49,13 @@
     // Enable experimental support for decorators
     "experimentalDecorators": true,
     // Emit design-type metadata for decorated declarations
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    // Base URL for module resolution
+    "baseUrl": ".",
+    // Path mapping for module resolution
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["vite.config.ts", "vitest.config.ts"]
 }

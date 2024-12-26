@@ -1,9 +1,8 @@
+import { ReactNode } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { BrowserRouter } from "react-router-dom";
-import React from 'react';
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SupabaseProvider } from "@/lib/supabase";
 
@@ -26,8 +25,7 @@ interface AppProvidersProps {
 export function AppProviders({ children }: AppProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <SupabaseProvider>
+      <SupabaseProvider>
           <ThemeProvider defaultTheme="system" storageKey="app-theme">
             <TooltipProvider>
               {children}
@@ -35,8 +33,7 @@ export function AppProviders({ children }: AppProvidersProps) {
               <Sonner />
             </TooltipProvider>
           </ThemeProvider>
-        </SupabaseProvider>
-      </BrowserRouter>
+      </SupabaseProvider>
     </QueryClientProvider>
   );
 };

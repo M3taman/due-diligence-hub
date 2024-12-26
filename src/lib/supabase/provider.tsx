@@ -1,8 +1,12 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { Session } from '@supabase/supabase-js'
 import { supabase } from './client'
 import { Loading } from '@/components/ui/loading'
-import type { SupabaseContextType, SupabaseProviderProps } from './types'
+import type { SupabaseContextType } from './types'
+
+interface SupabaseProviderProps {
+  children: ReactNode
+}
 
 const SupabaseContext = createContext<SupabaseContextType>({
   session: null,
