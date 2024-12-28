@@ -2,20 +2,26 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Icons } from "./ui/icons"
 import { useToast } from "./ui/use-toast"
-import { startTrial } from "@/lib/supabase/auth"
+// import { startTrial } from "@/lib/supabase/auth" // Removed trial initiation import
 import { AUTH_CONFIG } from "@/lib/auth/constants"
 
-export function AutoTrialInit() {
+const AutoTrialInit = () => {
   const navigate = useNavigate()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(true)
-
+  const [hasInitialized, setHasInitialized] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   useEffect(() => {
+    // Trial initiation is disabled
+    /*
     const initTrial = async () => {
+      setIsSubmitting(true)
       try {
         await startTrial()
         navigate(AUTH_CONFIG.ROUTES.TRIAL[0])
-      } catch (error) {
+      } catch (error: any) {
+        setError(error.message || 'Trial initialization failed.')
         console.error('Trial init error:', error)
         toast({
           variant: "destructive",
@@ -23,12 +29,17 @@ export function AutoTrialInit() {
           description: "Failed to start trial. Please refresh the page."
         })
       } finally {
+        setIsSubmitting(false)
         setIsLoading(false)
       }
     }
 
-    initTrial()
-  }, [navigate, toast])
+    if (!hasInitialized) {
+      setHasInitialized(true)
+      initTrial()
+    }
+    */
+  }, []) // Removed dependencies related to trial initiation
 
   if (isLoading) {
     return (
@@ -37,6 +48,8 @@ export function AutoTrialInit() {
       </div>
     )
   }
-
   return null
 }
+
+export default AutoTrialInit;
+export { AutoTrialInit };

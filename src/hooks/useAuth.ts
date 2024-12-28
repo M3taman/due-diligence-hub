@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Session } from '@supabase/supabase-js'
-import { supabase } from '@/lib/supabase/client'
+import { supabase, resetAuth } from '@/lib/supabase/client'
 import { AUTH_ROLES } from '@/lib/auth/constants'
 import type { UserRole, AuthState } from '@/lib/auth/types'
 
@@ -89,9 +89,14 @@ export function useAuth() {
         },
         isTrial: true
       }))
-    } catch (error) {
-      console.error('Failed to start trial:', error)
-      throw error
+    } catch (error: any) {
+      if (error.status === 429) {
+        console.error('Rate limit exceeded while starting trial:', error);
+        // Optionally notify the user or implement additional retry logic
+      } else {
+        console.error('Failed to start trial:', error);
+      }
+      throw error;
     }
   }
 

@@ -1,8 +1,10 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
+import react from '@vitejs/plugin-react'
 import path from 'path'
 import { VitePWA } from 'vite-plugin-pwa'
 import sitemap from 'vite-plugin-sitemap'
+import { imagetools } from 'vite-imagetools'
+import viteCompression from 'vite-plugin-compression'
 
 export default defineConfig({
   plugins: [
@@ -33,6 +35,8 @@ export default defineConfig({
     sitemap({
       hostname: 'https://yourdomain.com',
     }),
+    imagetools(),
+    viteCompression(),
   ],
   resolve: {
     alias: {
@@ -50,5 +54,6 @@ export default defineConfig({
       },
     },
     chunkSizeWarningLimit: 1000,
+    minify: 'terser',
   },
 });

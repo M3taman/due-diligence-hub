@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { Session } from '@supabase/supabase-js'
 import { supabase } from './client'
 import { Loading } from '@/components/ui/loading'
@@ -16,26 +16,45 @@ const SupabaseContext = createContext<SupabaseContextType>({
 export function SupabaseProvider({ children }: SupabaseProviderProps) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setLoading(false)
-    })
+    // Check if window is defined (browser environment)
+    if (typeof window === 'undefined') return
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
+    const initializeAuth = async () => {
+      try {
+        const { data: { session: initialSession }, error: sessionError } = 
+          await supabase.auth.getSession()
+        
+        if (sessionError) throw sessionError
+        setSession(initialSession)
 
-    return () => subscription.unsubscribe()
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          (_event: string, session: Session | null) => {
+            setSession(session)
+          }
+        )
+
+        return () => subscription.unsubscribe()
+      } catch (e) {
+        setError(e instanceof Error ? e : new Error('Failed to initialize auth'))
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    initializeAuth()
   }, [])
+
+  if (error) {
+    throw error // ErrorBoundary will catch this
+  }
 
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Loading size="lg" text="Loading..." />
+        <Loading size="lg" />
       </div>
     )
   }
@@ -49,7 +68,7 @@ export function SupabaseProvider({ children }: SupabaseProviderProps) {
 
 export const useSupabase = () => {
   const context = useContext(SupabaseContext)
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useSupabase must be used within a SupabaseProvider')
   }
   return context

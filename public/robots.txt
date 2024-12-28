@@ -1,0 +1,10 @@
+# Allow all crawlers complete access
+User-agent: *
+Disallow:
+
+Sitemap: https://yourdomain.com/sitemap.xml
+
+# Alternatively, disallow specific directories
+# User-agent: *
+# Disallow: /admin/
+# Disallow: /login/

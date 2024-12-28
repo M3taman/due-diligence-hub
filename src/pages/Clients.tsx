@@ -20,6 +20,7 @@ import { useClients } from "@/hooks/useClients";
 import { ClientModal } from "@/components/clients/ClientModal";
 import { formatDate } from "@/lib/utils";
 import { Helmet } from "react-helmet-async";
+import { supabase, resetAuth } from '@/lib/supabase/client';
 
 const Clients = () => {
   const [search, setSearch] = useState("");

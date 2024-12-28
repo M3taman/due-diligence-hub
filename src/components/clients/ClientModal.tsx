@@ -1,6 +1,7 @@
 // filepath: /d/due-diligence-hub/src/components/clients/ClientModal.tsx
 import React from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from '@/components/ui/modal';
+import { supabase } from '@/lib/supabase/client';
 
 interface ClientModalProps {
   isOpen: boolean;
@@ -23,4 +24,5 @@ export const ClientModal: React.FC<ClientModalProps> = ({ isOpen, onClose, clien
       </ModalFooter>
     </Modal>
   );
+};
 };

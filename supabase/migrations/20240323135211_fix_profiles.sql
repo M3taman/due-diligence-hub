@@ -18,6 +18,7 @@ create policy "Public profiles are viewable by everyone"
   on public.profiles for select
   using ( true );
 
+-- Ensure RLS policy allows users to insert their own profile
 create policy "Users can insert their own profile"
   on public.profiles for insert
   with check ( auth.uid() = id );

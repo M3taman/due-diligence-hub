@@ -8,38 +8,53 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
-// Clear any existing tokens
-localStorage.removeItem('sb-zdmdetvaodkrvbohvjzs-auth-token')
-
-// Create mutable client with proper configuration
 export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
   auth: {
-    persistSession: true,
     autoRefreshToken: true,
+    persistSession: true,
+    storage: window.localStorage,
+    storageKey: 'sb-zdmdetvaodkrvbohvjzs-auth-token',
     detectSessionInUrl: false
-  },
-  global: {
-    headers: {
-      'x-application-name': 'due-diligence-os'
-    }
   }
 })
 
-// Prevent object freezing that causes token update issues
+// Clear legacy tokens
+const clearTokens = () => {
+  localStorage.removeItem('sb-zdmdetvaodkrvbohvjzs-auth-token')
+  localStorage.removeItem('supabase-auth-token')
+  localStorage.removeItem('dudil-auth-token')
+}
+
+// clearTokens() // Commented out to avoid clearing tokens on initialization
+
+// Prevent object freezing
 Object.preventExtensions = function(obj) { return obj }
 
 // Handle auth state changes
 supabase.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_OUT') {
-    localStorage.clear()
+  if (event === 'SIGNED_OUT' || (event === 'TOKEN_REFRESHED' && !session)) {
+    clearTokens()
     window.location.reload()
   }
+  if (event === 'JWT_REFRESH_FAILED') { // Handle JWT refresh failures
+    clearTokens()
+    window.location.href = '/login' // Redirect to login page
+  }
+  // Debug session
+  console.log('Auth event:', event)
+  console.log('Session:', session)
 })
 
+// Handle authentication rate limits
+export const resetAuth = async () => {
+  clearTokens()
+  await supabase.auth.signOut()
+  window.location.reload()
+}
+
+// Type exports
 export type SupabaseClient = typeof supabase
 
-// Remove fetch.ts as we're using Supabase client directly
-// Usage example:
 export const getUserProfile = async (userId: string) => {
   const { data, error } = await supabase
     .from('profiles')
@@ -49,4 +64,10 @@ export const getUserProfile = async (userId: string) => {
 
   if (error) throw error
   return data
+}
+
+export const getSession = async () => {
+  const { data: { session }, error } = await supabase.auth.getSession()
+  if (error) throw error
+  return session
 }
