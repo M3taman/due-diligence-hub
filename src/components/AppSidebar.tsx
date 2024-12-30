@@ -38,6 +38,7 @@ export function AppSidebar() {
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="p-2 rounded-lg hover:bg-accent"
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <ChevronLeft className={`h-5 w-5 transition-transform ${
               isCollapsed ? 'rotate-180' : ''

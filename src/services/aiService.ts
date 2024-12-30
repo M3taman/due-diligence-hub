@@ -51,57 +51,9 @@ Guidelines:
 
 Format your response in markdown with clear sections and bullet points.`;
 
-export const aiService = {
-  async analyzeQuery(query: string): Promise<AnalysisResult> {
-    try {
-      const { data: embeddings } = await supabase.functions.invoke('generate-embeddings', {
-        body: { text: query }
-      });
+// If aiService is no longer used, consider removing this file.
+// Otherwise, ensure that no components depend on its functionalities.
 
-      const { data: relevantDocs } = await supabase.rpc('match_documents', {
-        query_embedding: embeddings,
-        match_threshold: 0.78,
-        match_count: 5
-      });
-
-      const { data: analysis } = await supabase.functions.invoke('analyze-content', {
-        body: {
-          query,
-          context: relevantDocs,
-          systemPrompt
-        }
-      });
-
-      return {
-        content: marked(analysis.content),
-        confidence: analysis.confidence || 0.85,
-        sources: analysis.sources || researchSources.slice(0, 3),
-        metadata: {
-          timestamp: new Date().toISOString(),
-          category: analysis.category || 'general',
-          complexity: analysis.complexity || 1,
-          lastUpdated: new Date().toISOString()
-        }
-      };
-    } catch (error) {
-      throw new Error(`Analysis failed: ${error.message}`);
-    }
-  },
-
-  async validateSources(sources: string[]): Promise<boolean> {
-    return sources.every(source => researchSources.includes(source));
-  },
-
-  async getLatestMarketData(): Promise<any> {
-    const { data, error } = await supabase
-      .from('market_data')
-      .select('*')
-      .order('timestamp', { ascending: false })
-      .limit(1);
-
-    if (error) throw error;
-    return data[0];
-  }
-};
+// Example: To remove the service, you can delete the file.
 
 export type { AnalysisResult };

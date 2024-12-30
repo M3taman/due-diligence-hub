@@ -50,7 +50,7 @@ export function NewsletterModal({ open, onOpenChange }: NewsletterModalProps) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error,
+        description: err instanceof z.ZodError ? err.errors[0].message : 'Failed to subscribe. Please try again.',
       });
     } finally {
       setLoading(false);

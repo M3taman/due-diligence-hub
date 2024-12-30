@@ -1,17 +1,3 @@
-export interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-  charts?: ChartData[];
-}
-
-export interface ChartData {
-  type: 'line' | 'area' | 'bar';
-  data: any[];
-  xKey: string;
-  yKey: string;
-  title?: string;
-}
-
 export interface ResearchEntry {
   id: string;
   user_id: string | null;

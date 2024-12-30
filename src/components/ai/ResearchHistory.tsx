@@ -87,3 +87,8 @@ export const ResearchHistory = () => {
     </Card>
   );
 };
+
+// If research history is no longer a feature, remove this component.
+// Otherwise, ensure that it doesn't depend on removed AI analysis functionalities.
+
+// Example: To remove the component, you can delete the file or comment out its content.

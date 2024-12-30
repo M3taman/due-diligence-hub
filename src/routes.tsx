@@ -1,6 +1,5 @@
 import { createBrowserRouter } from "react-router-dom"
 import { Layout } from "@/components/Layout"
-import { AutoTrialInit } from "@/components/AutoTrialInit"
 import { ProtectedRoute } from "@/components/routing/ProtectedRoute"
 import { Suspense, lazy } from "react"
 
@@ -13,17 +12,17 @@ const Clients = lazy(() => import("@/pages/Clients"))
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <AutoTrialInit />
+    element: <Layout />
   },
   {
     path: "/dashboard",
     element: (
       <ProtectedRoute>
-        <Layout>
-          <Suspense fallback={<div>Loading Dashboard...</div>}>
+        <Suspense fallback={<div>Loading Dashboard...</div>}>
+          <Layout>
             <Dashboard />
-          </Suspense>
-        </Layout>
+          </Layout>
+        </Suspense>
       </ProtectedRoute>
     )
   },
@@ -31,11 +30,11 @@ export const router = createBrowserRouter([
     path: "/research",
     element: (
       <ProtectedRoute>
-        <Layout>
-          <Suspense fallback={<div>Loading Research...</div>}>
+        <Suspense fallback={<div>Loading Research...</div>}>
+          <Layout>
             <Research />
-          </Suspense>
-        </Layout>
+          </Layout>
+        </Suspense>
       </ProtectedRoute>
     )
   },
@@ -43,11 +42,11 @@ export const router = createBrowserRouter([
     path: "/settings",
     element: (
       <ProtectedRoute>
-        <Layout>
-          <Suspense fallback={<div>Loading Settings...</div>}>
+        <Suspense fallback={<div>Loading Settings...</div>}>
+          <Layout>
             <Settings />
-          </Suspense>
-        </Layout>
+          </Layout>
+        </Suspense>
       </ProtectedRoute>
     )
   },
@@ -55,11 +54,11 @@ export const router = createBrowserRouter([
     path: "/faq",
     element: (
       <ProtectedRoute>
-        <Layout>
-          <Suspense fallback={<div>Loading FAQ...</div>}>
+        <Suspense fallback={<div>Loading FAQ...</div>}>
+          <Layout>
             <FAQ />
-          </Suspense>
-        </Layout>
+          </Layout>
+        </Suspense>
       </ProtectedRoute>
     )
   },
@@ -67,11 +66,11 @@ export const router = createBrowserRouter([
     path: "/clients",
     element: (
       <ProtectedRoute>
-        <Layout>
-          <Suspense fallback={<div>Loading Clients...</div>}>
+        <Suspense fallback={<div>Loading Clients...</div>}>
+          <Layout>
             <Clients />
-          </Suspense>
-        </Layout>
+          </Layout>
+        </Suspense>
       </ProtectedRoute>
     )
   },

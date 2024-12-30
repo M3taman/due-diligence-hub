@@ -38,7 +38,7 @@ export const ProfileSettings = () => {
           bio: data.bio,
           updated_at: new Date().toISOString()
         })
-        .eq('id', supabase.auth.user()?.id);
+        .eq('id', (await supabase.auth.getUser()).data.user?.id);
 
       if (error) throw error;
 

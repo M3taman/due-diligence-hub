@@ -28,9 +28,20 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   render() {
     if (this.state.hasError) {
-      return <h1>Something went wrong.</h1>;
+      return (
+        <Card className="p-4 my-4 bg-red-50 border-red-200">
+          <div className="flex items-center gap-2 text-red-600 mb-2">
+            <AlertCircle className="w-5 h-5" />
+            <h3 className="font-semibold">Something went wrong.</h3>
+          </div>
+          <p className="text-red-600 text-sm mb-4">
+            {this.state.error?.message || 'An unexpected error occurred.'}
+          </p>
+          <Button onClick={() => window.location.reload()}>Reload Page</Button>
+        </Card>
+      );
     }
 
-    return this.props.children
+    return this.props.children;
   }
 }

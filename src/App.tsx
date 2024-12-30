@@ -6,12 +6,13 @@ import { router } from "@/routes";
 import { Loading } from '@/components/ui/loading';
 import { Toaster } from '@/components/ui/toaster';
 import { Analytics } from '@/components/analytics/Analytics';
-import { AutoTrialInit } from '@/components/AutoTrialInit';
 import { HelmetProvider } from "react-helmet-async";
 import Index from './pages/Index';
 import FAQ from './pages/FAQ';
 import Dashboard from './pages/Dashboard';
 import Clients from './pages/Clients';
+import React from 'react';
+import TestSupabase from './components/TestSupabase'; // Example component
 
 const App = () => {
   return (
@@ -19,6 +20,10 @@ const App = () => {
       <HelmetProvider>
         <AppProviders>
           <RouterProvider router={router} />
+          <div>
+            <h1>Welcome to Due Diligence Hub</h1>
+            <TestSupabase />
+          </div>
         </AppProviders>
       </HelmetProvider>
     </ErrorBoundary>

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useContext } from 'react'
 import { SidebarContext } from '@/contexts/sidebar'
 import { useMediaQuery } from '@/hooks/use-media-query'
 

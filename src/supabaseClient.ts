@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Ensure you have VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
@@ -11,3 +10,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export default supabase
+
+// Update the fetchVersion function to log the PostgreSQL version
+export const fetchVersion = async () => {
+  const { data, error } = await supabase.rpc('pg_backend_version')
+  if (error) {
+    console.error('Error fetching version:', error)
+    return null
+  }
+  console.log('PostgreSQL Version:', data)
+  return data
+}
+
+// Removed CRUD functions to eliminate redundancy

@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import react from '@vitejs/plugin-react' // Changed from '@vitejs/plugin-react-swc'
 import path from 'path'
 import { VitePWA } from 'vite-plugin-pwa'
 import sitemap from 'vite-plugin-sitemap'
-import { imagetools } from 'vite-imagetools'
+import { imagetools } from 'vite-imagetools' // Ensure this is updated to version 7.0.5
 import viteCompression from 'vite-plugin-compression'
 
 export default defineConfig({
@@ -11,9 +11,11 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
         name: "Due Diligence Hub",
-        short_name: "DiligenceHub",
+        short_name: "DD Hub",
+        description: 'A web application for due diligence management.',
         start_url: "/",
         display: "standalone",
         background_color: "#ffffff",
@@ -35,7 +37,7 @@ export default defineConfig({
     sitemap({
       hostname: 'https://yourdomain.com',
     }),
-    imagetools(),
+    imagetools(), // Updated to vite-imagetools@7.0.5
     viteCompression(),
   ],
   resolve: {
@@ -55,5 +57,6 @@ export default defineConfig({
     },
     chunkSizeWarningLimit: 1000,
     minify: 'terser',
+    outDir: 'dist',
   },
 });

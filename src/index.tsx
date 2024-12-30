@@ -14,11 +14,11 @@ getCLS(sendToAnalytics)
 getFID(sendToAnalytics)
 getLCP(sendToAnalytics)
 
-ReactDOM.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+// ReactDOM.render(
+//   <React.StrictMode>
+//     <BrowserRouter>
+//       <App />
+//     </BrowserRouter>
+//   </React.StrictMode>,
+//   document.getElementById('root')
+// );

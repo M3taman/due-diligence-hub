@@ -2,7 +2,6 @@ import { ReactNode } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SupabaseProvider } from "@/lib/supabase";
 
@@ -30,7 +29,8 @@ export function AppProviders({ children }: AppProvidersProps) {
             <TooltipProvider>
               {children}
               <Toaster />
-              <Sonner />
+              {/* Remove Sonner if not needed */}
+              {/* <Sonner /> */}
             </TooltipProvider>
           </ThemeProvider>
       </SupabaseProvider>
